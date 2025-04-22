@@ -1,0 +1,61 @@
+POST http://localhost:7070/api/pegawai
+Content-Type: application/json
+
+{
+  "Nama_Pegawai": "dolfis",
+  "Jabatan": "Staff Gudang",
+  "PIN": "54321"
+}
+
+
+###
+GET http://localhost:7070/api/pegawai
+
+###
+PUT http://localhost:7070/api/pegawai/1
+Content-Type: application/json
+
+{
+  "Nama_Pegawai": "Jane Doe updated",
+  "Jabatan": "Staff Gudang",
+  "PIN": "5678"
+}
+
+###
+POST http://localhost:7070/api/login
+Content-Type: application/json
+
+{
+  "Nama_Pegawai": "dolfis",
+  "PIN": "54321"
+}
+
+###
+POST http://localhost:7070/api/riwayat-pengambilan
+Content-Type: application/json
+
+{
+  "ID_Barang": 1,
+  "ID_Pegawai": 5,
+  "Jumlah_Diambil": 5
+}
+
+###
+POST http://localhost:7070/api/auth/login
+Content-Type: application/json
+
+{
+  "Nama_Pegawai": "dolfis",
+  "PIN": "1234"
+}
+
+###
+POST http://localhost:7070/api/auth/register
+Content-Type: application/json
+
+{
+  "Nama_Pegawai": "dolfis",
+  "Jabatan": "Staff",
+  "PIN": "1234",
+  "Role": "admin"
+}

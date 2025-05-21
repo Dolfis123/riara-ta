@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.4",
-    "axios": "^1.8.4",
+    "axios": "^1.9.0",
     "axioss": "^0.0.1-security",
     "frontend": "file:",
     "jspdf": "^3.0.1",

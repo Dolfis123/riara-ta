@@ -255,35 +255,36 @@ const handleModalSubmit = async (e) => {
               <td className="border px-4 py-2">{barang.Deskripsi}</td>
               <td className="border px-4 py-2">{barang.Stok_Tersedia}</td>
               <td className="border px-4 py-2">
-  {barang.QR_Code && (
-    <div className="relative group w-20 h-20">
-      <img
-        src={barang.QR_Code}
-        alt="QR Code"
-        className="w-full h-full object-contain"
-      />
-      <a
-        href={barang.QR_Code}
-        download={`QRCode_${barang.Nama_Barang}.png`}
-        className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+{barang.QR_Code && (
+  <div className="relative group w-20 h-20">
+    <img
+      src={barang.QR_Code}
+      alt="QR Code"
+      className="w-full h-full object-contain"
+    />
+    <a
+      href={barang.QR_Code}
+      download={`QRCode_${barang.Nama_Barang}.png`}
+      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6 text-white"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"
-          />
-        </svg>
-      </a>
-    </div>
-  )}
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"
+        />
+      </svg>
+    </a>
+  </div>
+)}
+
 </td>
 
               <td className="border px-4 py-2">

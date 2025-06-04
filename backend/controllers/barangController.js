@@ -30,7 +30,7 @@ exports.createBarang = async (req, res) => {
     });
 
     // Membuat URL QR Code yang dapat diakses melalui domain Anda
-    const qrUrl = `https://skydance.life/public/qris/${qrFilename}`; // Gunakan nama domain
+    const qrUrl = `https://skydance.life/qris/${qrFilename}`;
 
     // Step 4: Update QR Code di database
     newBarang.QR_Code = qrUrl;

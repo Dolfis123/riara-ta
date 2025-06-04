@@ -26,7 +26,7 @@ app.use(
 app.use(
   cors({
     origin: function(origin, callback) {
-      const allowedOrigins = ['https://skydance.life', 'https://www.skydance.life'];
+      const allowedOrigins = ['https://skydance.life', 'https://www.skydance.life', 'http://localhost:5173'];
       
       // Jika request tidak punya origin (misal Postman atau server-to-server), kita izinkan juga (opsional)
       if (!origin) return callback(null, true);

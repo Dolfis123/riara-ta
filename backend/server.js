@@ -46,7 +46,7 @@ app.use(
 app.use('/qris', express.static(path.join(__dirname, 'public', 'qris')));
 
 // PATH untuk menyimpan QR Code
-app.use('/api', barangRoutes); // Rute untuk barang
+app.use('/api/barang', barangRoutes); // Rute untuk barang
 // app.use('/api', pegawaiRoutes); // Rute untuk pegawai
 app.use('/api/riwayat', riwayatPengambilanRoutes);  // Menambahkan riwayat pengambilan routes
 app.use('/api/auth', authRoutes);

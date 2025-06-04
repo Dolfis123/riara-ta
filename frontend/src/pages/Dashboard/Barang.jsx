@@ -255,13 +255,13 @@ const handleModalSubmit = async (e) => {
               <td className="border px-4 py-2">{barang.Deskripsi}</td>
               <td className="border px-4 py-2">{barang.Stok_Tersedia}</td>
               <td className="border px-4 py-2">
-  {barang.QR_Code && (
+{barang.QR_Code && (
   <div className="relative group w-20 h-20">
-    {/* Tambahkan console.log untuk melihat nilai barang.QR_Code */}
+    {/* Menambahkan log untuk memeriksa nilai QR Code */}
     {console.log("QR Code URL:", barang.QR_Code)}
 
     <img
-      src={barang.QR_Code}
+      src={barang.QR_Code} // Pastikan QR Code URL yang diterima menggunakan HTTPS
       alt="QR Code"
       className="w-full h-full object-contain"
     />

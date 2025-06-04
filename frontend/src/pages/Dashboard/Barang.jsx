@@ -258,7 +258,7 @@ const handleModalSubmit = async (e) => {
 {barang.QR_Code && (
   <div className="relative group w-20 h-20">
     <img
-      src={barang.QR_Code}
+      src={barang.QR_Code}  // Pastikan URL QR Code sudah lengkap dan benar
       alt="QR Code"
       className="w-full h-full object-contain"
     />
@@ -284,6 +284,7 @@ const handleModalSubmit = async (e) => {
     </a>
   </div>
 )}
+
 
 </td>
 

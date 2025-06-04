@@ -2,7 +2,6 @@ const Barang = require('../models/Barang');
 const QRCode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
-const { v4: uuidv4 } = require('uuid');  // Menggunakan UUID untuk ID unik
 
 exports.createBarang = async (req, res) => {
   try {
@@ -16,14 +15,14 @@ exports.createBarang = async (req, res) => {
       QR_Code: '', // placeholder sementara
     });
 
-    // Step 2: Generate QR Code URL yang unik menggunakan UUID
-    const qrFilename = `barang-${uuidv4()}.png`;  // Menggunakan UUID untuk nama file yang unik
+    // Step 2: Generate QR Code dengan ID Barang sebagai bagian dari nama file
+    const qrFilename = `barang-${newBarang.ID_Barang}.png`;  // Gunakan ID_Barang untuk nama file
     const qrPath = path.join(__dirname, '..', 'public', 'qris', qrFilename);
 
     // Pastikan folder public/qris ada
     fs.mkdirSync(path.dirname(qrPath), { recursive: true });
 
-    // Step 3: Buat QR Code dan simpan ke file
+    // Step 3: Generate QR Code dan simpan ke file
     await QRCode.toFile(qrPath, String(newBarang.ID_Barang), {
       errorCorrectionLevel: 'H',
       type: 'png',
@@ -31,9 +30,9 @@ exports.createBarang = async (req, res) => {
     });
 
     // Membuat URL QR Code yang dapat diakses melalui domain Anda
-    const qrUrl = `https://skydance.life/public/qris/${qrFilename}`;
+    const qrUrl = `${process.env.BASE_URL}/public/qris/${qrFilename}`;
 
-    // Update QR Code di database
+    // Step 4: Update QR Code di database
     newBarang.QR_Code = qrUrl;
     await newBarang.save();
     

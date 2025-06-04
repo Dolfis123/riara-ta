@@ -257,15 +257,27 @@ const handleModalSubmit = async (e) => {
               <td className="border px-4 py-2">
 {barang.QR_Code && (
   <div className="relative group w-20 h-20">
+    {/* Gambar QR Code */}
     <img
-      src={barang.QR_Code}  // Pastikan URL QR Code sudah lengkap dan benar
-      alt="QR Code"
-      className="w-full h-full object-contain"
+      src={barang.QR_Code}
+      alt={`QR Code for ${barang.Nama_Barang}`}
+      className="w-full h-full object-contain rounded shadow"
     />
-    <a
-      href={barang.QR_Code}
-      download={`QRCode_${barang.Nama_Barang}.png`}
+
+    {/* Tombol download via programmatic link (lebih aman untuk base64) */}
+    <button
+      type="button"
+      onClick={() => {
+        const link = document.createElement('a');
+        link.href = barang.QR_Code;
+        link.download = `QRCode_${barang.Nama_Barang}.png`;
+        link.type = 'image/png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }}
       className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+      title={`Download QRCode_${barang.Nama_Barang}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -281,7 +293,7 @@ const handleModalSubmit = async (e) => {
           d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"
         />
       </svg>
-    </a>
+    </button>
   </div>
 )}
 

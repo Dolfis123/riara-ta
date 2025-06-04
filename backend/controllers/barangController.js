@@ -1,49 +1,39 @@
 const Barang = require('../models/Barang');
 const QRCode = require('qrcode');
-const fs = require('fs');
-const path = require('path');
+
 
 exports.createBarang = async (req, res) => {
   try {
     const { Nama_Barang, Deskripsi, Stok_Tersedia } = req.body;
 
-    // Step 1: Buat entri barang tanpa QR_Code dulu
+    // 1. Buat data barang dulu (QR_Code kosong)
     const newBarang = await Barang.create({
       Nama_Barang,
       Deskripsi,
       Stok_Tersedia,
-      QR_Code: '', // placeholder sementara
+      QR_Code: '', // sementara
     });
 
-    // Step 2: Generate QR Code dengan ID Barang sebagai bagian dari nama file
-    const qrFilename = `barang-${newBarang.ID_Barang}.png`;  // Gunakan ID_Barang untuk nama file
-    const qrPath = path.join(__dirname, '..', 'public', 'qris', qrFilename);
-
-    // Pastikan folder public/qris ada
-    fs.mkdirSync(path.dirname(qrPath), { recursive: true });
-
-    // Step 3: Generate QR Code dan simpan ke file
-    await QRCode.toFile(qrPath, String(newBarang.ID_Barang), {
+    // 2. Generate QR code ke base64
+    const qrData = `ID:${newBarang.ID_Barang} | Nama: ${newBarang.Nama_Barang}`;
+    const qrImageBase64 = await QRCode.toDataURL(qrData, {
       errorCorrectionLevel: 'H',
-      type: 'png',
       width: 300,
     });
 
-    // Membuat URL QR Code yang dapat diakses melalui domain Anda
-    const qrUrl = `https://skydance.life/qris/${qrFilename}`;
-
-    // Step 4: Update QR Code di database
-    newBarang.QR_Code = qrUrl;
+    // 3. Simpan data base64 ke QR_Code (jika ingin)
+    newBarang.QR_Code = qrImageBase64;
     await newBarang.save();
-    
-    res.status(201).json({ message: 'Barang created successfully', data: newBarang });
+
+    res.status(201).json({
+      message: 'Barang created successfully',
+      data: newBarang,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error creating Barang', error });
   }
 };
-
-
 
 
 // Read All Barang

@@ -257,14 +257,16 @@ const handleModalSubmit = async (e) => {
               <td className="border px-4 py-2">
   {barang.QR_Code && (
   <div className="relative group w-20 h-20">
-    {/* Pastikan URL gambar lengkap */}
+    {/* Tambahkan console.log untuk melihat nilai barang.QR_Code */}
+    {console.log("QR Code URL:", barang.QR_Code)}
+
     <img
-      src={`${API_URL}/public/qris/${barang.QR_Code}`} // Gabungkan base URL
+      src={barang.QR_Code}
       alt="QR Code"
       className="w-full h-full object-contain"
     />
     <a
-      href={`${API_URL}/public/qris/${barang.QR_Code}`} // Gabungkan base URL
+      href={barang.QR_Code}
       download={`QRCode_${barang.Nama_Barang}.png`}
       className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
     >

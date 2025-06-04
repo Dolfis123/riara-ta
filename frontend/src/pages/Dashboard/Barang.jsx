@@ -261,12 +261,12 @@ const handleModalSubmit = async (e) => {
     {console.log("QR Code URL:", barang.QR_Code)}
 
     <img
-      src={barang.QR_Code} // Pastikan QR Code URL yang diterima menggunakan HTTPS
+      src={`https://skydance.life${barang.QR_Code}`} // Menambahkan domain dan path lengkap
       alt="QR Code"
       className="w-full h-full object-contain"
     />
     <a
-      href={barang.QR_Code}
+      href={`https://skydance.life${barang.QR_Code}`} // Menambahkan domain dan path lengkap
       download={`QRCode_${barang.Nama_Barang}.png`}
       className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
     >
@@ -287,6 +287,7 @@ const handleModalSubmit = async (e) => {
     </a>
   </div>
 )}
+
 
 </td>
 

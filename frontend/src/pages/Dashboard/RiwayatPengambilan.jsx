@@ -113,7 +113,7 @@ const RiwayatPengambilan = () => {
             filteredRiwayat.map((item, index) => (
               <tr key={index} className="hover:bg-gray-50">
                 <td className="border px-4 py-2">
-                  {item.pegawai ? item.pegawai.Nama_Pegawai : 'Nama Pegawai Tidak Ditemukan'}
+                  {item.pegawai ? item.pegawai.Nama_Pegawai : '-'}
                 </td>
                 <td className="border px-4 py-2">
                   {item.barang ? item.barang.Nama_Barang : 'Nama Barang Tidak Ditemukan'}

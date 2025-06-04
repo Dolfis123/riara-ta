@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../../index.css"; // Import CSS file for styling
 import logo from '../../images/logo/logo.png'; // Import logo image
+import bgImage from '../../images/logo/pnMkw.jpeg';
+
 function SignIn() {
   const [namaPegawai, setNamaPegawai] = useState('');
   const [pin, setPin] = useState('');
@@ -52,7 +54,11 @@ function SignIn() {
   
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300 dark:from-gray-900 dark:to-gray-800 px-4">
+<div
+  className="min-h-screen flex items-center justify-center bg-cover bg-center px-4"
+  style={{ backgroundImage: `url(${bgImage})` }}
+>
+
       <div className="w-full max-w-md bg-white dark:bg-gray-900 shadow-xl rounded-2xl p-8">
         <div className="text-center mb-6">
           <img

@@ -224,7 +224,7 @@ const [pinError, setPinError] = useState("");
 <div className="relative w-full md:w-1/2 mb-4">
   <input
     type="text"
-    placeholder="Cari berdasarkan Nama Barang..."
+    placeholder="Cari berdasarkan Nama Pegawai..."
     value={searchTerm}
     onChange={(e) => {
       setSearchTerm(e.target.value);

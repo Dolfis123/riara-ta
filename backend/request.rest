@@ -54,8 +54,8 @@ POST http://localhost:7070/api/auth/register
 Content-Type: application/json
 
 {
-  "Nama_Pegawai": "dolfis",
+  "Nama_Pegawai": "super admin",
   "Jabatan": "Staff",
   "PIN": "1234",
-  "Role": "admin"
+  "Role": "super_admin"
 }

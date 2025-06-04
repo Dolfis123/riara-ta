@@ -13,45 +13,48 @@ function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError(''); // Reset error
-  
-    try {
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ Nama_Pegawai: namaPegawai, PIN: pin }),
-      });
-  
-      const data = await response.json();
-  
-      if (response.ok) {
-        // Simpan token, role, username, dan ID Pegawai ke localStorage
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('role', data.role);
-        localStorage.setItem('username', data.username);
-        localStorage.setItem('ID_Pegawai', data.ID_Pegawai); // Simpan ID Pegawai
-  
-        if (data.role === 'pegawai') {
-          navigate('/scan-qrcode'); // Arahkan pegawai ke halaman scan QR
-        } else if (data.role === 'admin') {
-          navigate('/data-pegawai');
-        } else if( data.role === 'super_admin') {
-          navigate('/super-admin'); // Arahkan super admin ke halaman super admin
-        }else{
-          alert('Role tidak dikenali. Hubungi admin.');
-        }
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setError(''); // Reset error
+
+  // Menambahkan log untuk memeriksa nilai API_URL
+  console.log("API URL:", API_URL);
+
+  try {
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ Nama_Pegawai: namaPegawai, PIN: pin }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // Simpan token, role, username, dan ID Pegawai ke localStorage
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('role', data.role);
+      localStorage.setItem('username', data.username);
+      localStorage.setItem('ID_Pegawai', data.ID_Pegawai); // Simpan ID Pegawai
+
+      if (data.role === 'pegawai') {
+        navigate('/scan-qrcode'); // Arahkan pegawai ke halaman scan QR
+      } else if (data.role === 'admin') {
+        navigate('/data-pegawai');
+      } else if (data.role === 'super_admin') {
+        navigate('/super-admin'); // Arahkan super admin ke halaman super admin
       } else {
-        setError(data.message || 'Login gagal, silakan coba lagi.');
+        alert('Role tidak dikenali. Hubungi admin.');
       }
-    } catch (err) {
-      setError('Server error, silakan coba lagi nanti.');
+    } else {
+      setError(data.message || 'Login gagal, silakan coba lagi.');
     }
-  };
-  
+  } catch (err) {
+    setError('Server error, silakan coba lagi nanti.');
+  }
+};
+
   
 
   return (

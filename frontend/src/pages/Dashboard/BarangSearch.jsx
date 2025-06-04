@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const BarangSearch = () => {
   const [keyword, setKeyword] = useState('');
@@ -11,7 +12,7 @@ const BarangSearch = () => {
     setLoading(true);
 
     try {
-      const res = await axios.get(`http://localhost:7070/api/barang/search`, {
+      const res = await axios.get(`${API_URL}/barang/search`, {
         params: { nama: keyword }
       });
       setResults(res.data);

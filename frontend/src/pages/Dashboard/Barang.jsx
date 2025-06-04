@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import QRCode from "qrcode";  // Pastikan Anda sudah install library qrcode
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Barang = () => {
   const [barangList, setBarangList] = useState([]);
@@ -42,7 +43,7 @@ const Barang = () => {
   useEffect(() => {
     const fetchBarang = async () => {
       try {
-        const response = await axios.get("http://localhost:7070/api/barang");
+        const response = await axios.get(`${API_URL}/barang`);
         setBarangList(response.data); // Set hasil data ke state
       } catch (error) {
         console.error("Error fetching barang", error);
@@ -94,7 +95,7 @@ const Barang = () => {
     if (!barangToDelete) return; // Tambahkan pengecekan agar tidak melakukan operasi saat barangToDelete masih null
   
     try {
-      await axios.delete(`http://localhost:7070/api/barang/${barangToDelete.ID_Barang}`);
+      await axios.delete(`${API_URL}/barang/${barangToDelete.ID_Barang}`);
       setBarangList(barangList.filter((barang) => barang.ID_Barang !== barangToDelete.ID_Barang));
       setSuccessMessage("Data barang berhasil dihapus.");
       setIsConfirmModalOpen(false); // Tutup modal konfirmasi setelah berhasil
@@ -117,23 +118,23 @@ const handleModalSubmit = async (e) => {
 
     if (isEditing) {
       await axios.put(
-        `http://localhost:7070/api/barang/${currentBarang.ID_Barang}`,
+        `${API_URL}/barang/${currentBarang.ID_Barang}`,
         formData
       );
       setSuccessMessage("Data barang berhasil diedit.");
       setIsModalOpen(false); // Tutup setelah berhasil edit
     } else {
-      const res = await axios.post("http://localhost:7070/api/barang", formData);
+      const res = await axios.post(`${API_URL}/barang`, formData);
       insertedId = res.data.ID_Barang;
     
       // Tutup modal lebih awal agar tetap tertutup meskipun QR gagal
       setIsModalOpen(false);
     
       try {
-        const qrUrl = `http://localhost:5173/api/barang/${insertedId}`;
+        const qrUrl = `${API_URL}/barang/${insertedId}`;
         const qrCode = await QRCode.toDataURL(qrUrl);
     
-        await axios.put(`http://localhost:7070/api/barang/${insertedId}`, {
+        await axios.put(`${API_URL}/barang/${insertedId}`, {
           QR_Code: qrCode,
         });
       } catch (qrError) {
@@ -145,7 +146,7 @@ const handleModalSubmit = async (e) => {
     
 
     // Ambil ulang data barang
-    const response = await axios.get("http://localhost:7070/api/barang");
+    const response = await axios.get(`${API_URL}/barang`);
     setBarangList(response.data);
 
     // Reset form dan tutup modal

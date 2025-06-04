@@ -6,6 +6,7 @@ import axios from "axios";
 import "../styles/scanQR.css";
 import beepSound from "../../assets/beep.mp3";
 import successGif from "../../assets/success.gifs.gif";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function ScanQRCode() {
   const webcamRef = useRef(null);
@@ -42,7 +43,7 @@ function ScanQRCode() {
         beep.play();
 
         axios
-          .get(`http://localhost:7070/api/barang/${id}`)
+          .get(`${API_URL}/barang/${id}`)
           .then((res) => {
             setBarang(res.data);
             setErrorMsg("");
@@ -86,7 +87,7 @@ function ScanQRCode() {
 
     try {
       const res = await axios.post(
-        "http://localhost:7070/api/barang/pengambilan",
+        `${API_URL}/barang/pengambilan`,
         {
           ID_Barang: barang.ID_Barang,
           Jumlah_Diambil: jumlah,

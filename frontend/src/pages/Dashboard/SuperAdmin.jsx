@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const SuperAdmin = () => {
   const [pegawaiList, setPegawaiList] = useState([]);
@@ -46,7 +47,7 @@ const [pinError, setPinError] = useState("");
       try {
         const token = localStorage.getItem("token"); // Ambil token dari localStorage
   
-        const response = await axios.get("http://localhost:7070/api/auth", {
+        const response = await axios.get(`${API_URL}/auth`, {
           headers: {
             Authorization: `Bearer ${token}` // Kirim token sebagai Bearer token
           }
@@ -108,7 +109,7 @@ const [pinError, setPinError] = useState("");
     try {
       const token = localStorage.getItem("token");
 
-      await axios.delete(`http://localhost:7070/api/pegawai/${pegawaiToDelete.ID_Pegawai}`, {
+      await axios.delete(`${API_URL}/pegawai/${pegawaiToDelete.ID_Pegawai}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -147,19 +148,19 @@ const [pinError, setPinError] = useState("");
   
       if (isEditing) {
         await axios.put(
-          `http://localhost:7070/api/pegawai/${currentPegawai.ID_Pegawai}`,
+          `${API_URL}/pegawai/${currentPegawai.ID_Pegawai}`,
           payload,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setSuccessMessage("Data pegawai berhasil diedit.");
       } else {
-        await axios.post("http://localhost:7070/api/auth/register", payload, {
+        await axios.post(`${API_URL}/auth/register`, payload, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setSuccessMessage("Data pegawai berhasil ditambahkan.");
       }
   
-      const response = await axios.get("http://localhost:7070/api/pegawai", {
+      const response = await axios.get(`${API_URL}/pegawai`, {
         headers: { Authorization: `Bearer ${token}` },
       });
   

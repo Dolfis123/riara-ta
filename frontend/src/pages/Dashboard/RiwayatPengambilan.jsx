@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const RiwayatPengambilan = () => {
   const [riwayat, setRiwayat] = useState([]);
@@ -12,7 +13,7 @@ const RiwayatPengambilan = () => {
   useEffect(() => {
     const fetchRiwayat = async () => {
       try {
-        const res = await axios.get("http://localhost:7070/api/riwayat/pengambilan");
+        const res = await axios.get(`${API_URL}/riwayat/pengambilan`);
         setRiwayat(res.data.riwayat);
         setFilteredRiwayat(res.data.riwayat);
       } catch (error) {

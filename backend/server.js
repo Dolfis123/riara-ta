@@ -25,12 +25,22 @@ app.use(
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: function(origin, callback) {
+      const allowedOrigins = ['https://skydance.life', 'https://www.skydance.life'];
+      
+      // Jika request tidak punya origin (misal Postman atau server-to-server), kita izinkan juga (opsional)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
-
 
 // Serve static files (QR Code images)
 app.use('/public/qris', express.static(path.join(__dirname, 'public', 'qris')));

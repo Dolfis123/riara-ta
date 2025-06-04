@@ -255,18 +255,18 @@ const handleModalSubmit = async (e) => {
               <td className="border px-4 py-2">{barang.Deskripsi}</td>
               <td className="border px-4 py-2">{barang.Stok_Tersedia}</td>
               <td className="border px-4 py-2">
-  {barang.QR_Code && (
+ {barang.QR_Code && (
   <div className="relative group w-20 h-20">
     {/* Tambahkan console.log untuk melihat nilai barang.QR_Code */}
     {console.log("QR Code URL:", barang.QR_Code)}
 
     <img
-      src={barang.QR_Code}
+      src={`https://skydance.life${barang.QR_Code}`} // Menambahkan domain ke path QR Code
       alt="QR Code"
       className="w-full h-full object-contain"
     />
     <a
-      href={barang.QR_Code}
+      href={`https://skydance.life${barang.QR_Code}`} // Menambahkan domain ke path QR Code untuk link download
       download={`QRCode_${barang.Nama_Barang}.png`}
       className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
     >

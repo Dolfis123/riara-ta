@@ -29,7 +29,8 @@ exports.createBarang = async (req, res) => {
       width: 300,
     });
 
-    const qrUrl = `${req.protocol}://${req.get('host')}/public/qris/${qrFilename}`;
+  const qrUrl = `https://skydance.life/public/qris/${qrFilename}`;
+
     newBarang.QR_Code = qrUrl;
     await newBarang.save();
     

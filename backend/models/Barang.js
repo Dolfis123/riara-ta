@@ -1,11 +1,11 @@
 const { DataTypes } = require('sequelize');
 const db = require('../config/database');
 
-const Barang = db.define('Barang', {
+const Barang = db.define('barang', {
   ID_Barang: {
     type: DataTypes.INTEGER,
-    autoIncrement: true,
     primaryKey: true,
+    autoIncrement: true,
   },
   Nama_Barang: {
     type: DataTypes.STRING(100),
@@ -20,13 +20,13 @@ const Barang = db.define('Barang', {
     allowNull: false,
   },
   QR_Code: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(255),
     allowNull: false,
-    unique: true,
   },
   Tanggal_Tambah: {
     type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
+    allowNull: true,
+    defaultValue: db.literal('CURRENT_TIMESTAMP'),
   },
 }, {
   tableName: 'barang',

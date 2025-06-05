@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const QRCode = require('qrcode');
 const { v4: uuidv4 } = require('uuid');
-const Barang = require('../models/barang');
+const Barang = require('../models/Barang');
 
 exports.createBarang = async (req, res) => {
   try {

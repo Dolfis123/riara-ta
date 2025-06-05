@@ -132,6 +132,7 @@ const handleModalSubmit = async (e) => {
     
       try {
         const qrUrl = `${API_URL}/barang/${insertedId}`;
+        console.log('URL QR Code:', qrUrl);  // Debugging URL
         const qrCode = await QRCode.toDataURL(qrUrl);
     
         await axios.put(`${API_URL}/barang/${insertedId}`, {

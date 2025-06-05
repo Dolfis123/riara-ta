@@ -17,7 +17,8 @@ exports.createBarang = async (req, res) => {
 
     // Step 2: Generate nama file QR Code
     const qrFilename = `barang-${newBarang.ID_Barang}.png`;
-    const qrPath = path.join(__dirname, '..', 'public', 'qris', qrFilename);
+
+const qrPath = path.join(process.cwd(), 'public', 'qris', qrFilename);
 
     // Pastikan folder public/qris ada
     fs.mkdirSync(path.dirname(qrPath), { recursive: true });

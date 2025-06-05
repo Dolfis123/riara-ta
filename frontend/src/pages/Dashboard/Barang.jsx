@@ -105,36 +105,44 @@ const Barang = () => {
     }
   };
   
- const handleModalSubmit = async (e) => {
+const handleModalSubmit = async (e) => {
   e.preventDefault();
   setIsSubmitting(true);
-  
+  setSuccessMessage(""); // Reset pesan sukses
+
   try {
     let insertedId;
+    
     if (isEditing) {
+      // Update Barang
       await axios.put(`${API_URL}/barang/${currentBarang.ID_Barang}`, formData);
       setSuccessMessage("Data barang berhasil diedit.");
       setIsModalOpen(false);
     } else {
+      // Tambah Barang
       const res = await axios.post(`${API_URL}/barang`, formData);
-      insertedId = res.data.ID_Barang;
-    
+
+      // Pastikan response mengembalikan ID_Barang yang valid
+      insertedId = res.data.data.ID_Barang;
       if (!insertedId) {
         console.error("Error: insertedId is undefined");
-        return;  // Berhenti jika ID_Barang tidak valid
+        return; // Berhenti jika ID_Barang tidak ada
       }
-    
+
       setIsModalOpen(false);
     
+      // Generate QR code dan simpan
       const qrUrl = `${API_URL}/barang/${insertedId}`;
       const qrCode = await QRCode.toDataURL(qrUrl);
     
-      await axios.put(`${API_URL}/barang/${insertedId}`, { QR_Code: qrCode });
-    
+      await axios.put(`${API_URL}/barang/${insertedId}`, {
+        QR_Code: qrCode,
+      });
+
       setSuccessMessage("Data barang berhasil ditambahkan.");
     }
-    
-    // Refresh data barang
+
+    // Ambil ulang data barang setelah operasi
     const response = await axios.get(`${API_URL}/barang`);
     setBarangList(response.data);
 
@@ -144,7 +152,6 @@ const Barang = () => {
       Deskripsi: "",
       Stok_Tersedia: 0,
     });
-
     setIsEditing(false);
     setCurrentBarang(null);
 

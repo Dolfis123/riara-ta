@@ -41,7 +41,12 @@ const qrPath = path.join(process.cwd(), 'public', 'qris', qrFilename);
     newBarang.QR_Code = qrUrl;
     await newBarang.save();
 
-    res.status(201).json({ message: 'Barang created successfully', data: newBarang });
+
+    res.status(201).json({
+  message: 'Barang created successfully',
+  data: newBarang, // Pastikan newBarang berisi ID_Barang
+});
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error creating Barang', error });

@@ -1,34 +1,52 @@
+const Barang = require('../models/Barang');
+const QRCode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
-const QRCode = require('qrcode');
-const { v4: uuidv4 } = require('uuid');
-const Barang = require('../models/Barang');
 
 exports.createBarang = async (req, res) => {
   try {
     const { Nama_Barang, Deskripsi, Stok_Tersedia } = req.body;
 
-    const uuid = uuidv4();
-    const fileName = `${uuid}.png`;
-    const qrPath = path.join(__dirname, '..', 'public', 'qris', fileName);
-
-    await QRCode.toFile(qrPath, uuid);
-
+    // Step 1: Buat entri barang tanpa QR_Code dulu
     const newBarang = await Barang.create({
       Nama_Barang,
       Deskripsi,
       Stok_Tersedia,
-      QR_Code: fileName,
+      QR_Code: '', // placeholder sementara
     });
 
-    const qrImageUrl = `${req.protocol}://${req.get('host')}/qris/${fileName}`;
+    // Pastikan ID_Barang sudah ada
+    if (!newBarang.ID_Barang) {
+      throw new Error("ID_Barang tidak ditemukan setelah pembuatan barang");
+    }
+
+    // Step 2: Generate nama file QR Code menggunakan ID_Barang untuk memastikan keunikannya
+    const qrFilename = `barang-${newBarang.ID_Barang}.png`;  // Menggunakan ID_Barang untuk memastikan file unik
+    const qrPath = path.join(process.cwd(), 'public', 'qris', qrFilename);  // Path untuk menyimpan file QR code
+
+    // Pastikan folder public/qris ada
+    fs.mkdirSync(path.dirname(qrPath), { recursive: true });
+
+    // Step 3: Buat QR Code yang menyimpan ID_Barang
+    await QRCode.toFile(qrPath, String(newBarang.ID_Barang), {
+      errorCorrectionLevel: 'H',
+      type: 'png',
+      width: 300,
+    });
+
+    // Step 4: Simpan path relatif file QR Code di database (tanpa domain)
+    const qrRelativePath = `/qris/${qrFilename}`;  // Simpan path relatif QR Code
+    newBarang.QR_Code = qrRelativePath;
+    await newBarang.save();
 
     res.status(201).json({
-      ...newBarang.toJSON(),
-      qr_image_url: qrImageUrl,
+      message: 'Barang created successfully',
+      data: newBarang, // Pastikan newBarang berisi ID_Barang dan QR_Code
     });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Error creating Barang', error });
   }
 };
 

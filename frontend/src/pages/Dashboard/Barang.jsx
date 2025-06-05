@@ -105,69 +105,52 @@ const Barang = () => {
     }
   };
   
-  
-const handleModalSubmit = async (e) => {
+ const handleModalSubmit = async (e) => {
   e.preventDefault();
-  console.log('Form submitted'); // Debug
   setIsSubmitting(true);
-  setSuccessMessage(""); // Reset pesan
-
+  
   try {
-    console.log('Trying to submit...'); // Debug
     let insertedId;
-
     if (isEditing) {
-      await axios.put(
-        `${API_URL}/barang/${currentBarang.ID_Barang}`,
-        formData
-      );
+      await axios.put(`${API_URL}/barang/${currentBarang.ID_Barang}`, formData);
       setSuccessMessage("Data barang berhasil diedit.");
-      setIsModalOpen(false); // Tutup setelah berhasil edit
+      setIsModalOpen(false);
     } else {
       const res = await axios.post(`${API_URL}/barang`, formData);
       insertedId = res.data.ID_Barang;
     
-      // Tutup modal lebih awal agar tetap tertutup meskipun QR gagal
+      if (!insertedId) {
+        console.error("Error: insertedId is undefined");
+        return;  // Berhenti jika ID_Barang tidak valid
+      }
+    
       setIsModalOpen(false);
     
-      try {
-        const qrUrl = `${API_URL}/barang/${insertedId}`;
-        console.log('URL QR Code:', qrUrl);  // Debugging URL
-        const qrCode = await QRCode.toDataURL(qrUrl);
+      const qrUrl = `${API_URL}/barang/${insertedId}`;
+      const qrCode = await QRCode.toDataURL(qrUrl);
     
-        await axios.put(`${API_URL}/barang/${insertedId}`, {
-          QR_Code: qrCode,
-        });
-      } catch (qrError) {
-        console.warn("QR code generation failed:", qrError);
-      }
+      await axios.put(`${API_URL}/barang/${insertedId}`, { QR_Code: qrCode });
     
       setSuccessMessage("Data barang berhasil ditambahkan.");
     }
     
-
-    // Ambil ulang data barang
+    // Refresh data barang
     const response = await axios.get(`${API_URL}/barang`);
     setBarangList(response.data);
 
-    // Reset form dan tutup modal
+    // Reset form
     setFormData({
       Nama_Barang: "",
       Deskripsi: "",
       Stok_Tersedia: 0,
     });
-    console.log('Closing modal...'); // Debug
-    setIsModalOpen(false); // Pastikan ini dipanggil
+
     setIsEditing(false);
     setCurrentBarang(null);
 
-    setTimeout(() => setSuccessMessage(""), 3000);
   } catch (error) {
-    console.error('Error details:', error); // Debug lebih detail
-    const message =
-      error.response?.data?.message || "Gagal menyimpan data barang.";
-    setSuccessMessage(message);
-    console.error("Error saving barang:", message);
+    console.error("Error saving barang:", error);
+    setSuccessMessage("Gagal menyimpan data barang.");
   } finally {
     setIsSubmitting(false);
   }

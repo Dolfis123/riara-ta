@@ -8,12 +8,18 @@ exports.createBarang = async (req, res) => {
     const { Nama_Barang, Deskripsi, Stok_Tersedia } = req.body;
 
     // Step 1: Buat entri barang tanpa QR_Code dulu
-    const newBarang = await Barang.create({
-      Nama_Barang,
-      Deskripsi,
-      Stok_Tersedia,
-      QR_Code: '', // placeholder sementara
-    });
+  const newBarang = await Barang.create({
+  Nama_Barang,
+  Deskripsi,
+  Stok_Tersedia,
+  QR_Code: '', // placeholder sementara
+});
+
+// Pastikan ID_Barang sudah ada
+if (!newBarang.ID_Barang) {
+  throw new Error("ID_Barang tidak ditemukan setelah pembuatan barang");
+}
+
 
     // Step 2: Generate nama file QR Code
     const qrFilename = `barang-${newBarang.ID_Barang}.png`;

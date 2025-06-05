@@ -255,7 +255,7 @@ const handleModalSubmit = async (e) => {
               <td className="border px-4 py-2">{barang.Deskripsi}</td>
               <td className="border px-4 py-2">{barang.Stok_Tersedia}</td>
               <td className="border px-4 py-2">
-<td className="border px-4 py-2">
+
   {barang.QR_Code && (
     <div className="relative group w-20 h-20">
       <img
@@ -285,7 +285,7 @@ const handleModalSubmit = async (e) => {
       </a>
     </div>
   )}
-</td>
+
 
 
 

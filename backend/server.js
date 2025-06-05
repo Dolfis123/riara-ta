@@ -44,6 +44,7 @@ app.use(
 
 // Serve static files (QR Code images)
 app.use('/qris', express.static(path.join(__dirname, 'public', 'qris')));
+app.use('/qris', express.static('public/qris'));
 
 // PATH untuk menyimpan QR Code
 app.use('/api/barang', barangRoutes); // Rute untuk barang

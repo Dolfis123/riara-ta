@@ -2,6 +2,7 @@ const Barang = require('../models/Barang');
 const QRCode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
+
 exports.createBarang = async (req, res) => {
   try {
     const { Nama_Barang, Deskripsi, Stok_Tersedia } = req.body;

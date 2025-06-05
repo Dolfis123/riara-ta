@@ -8,23 +8,21 @@ exports.createBarang = async (req, res) => {
     const { Nama_Barang, Deskripsi, Stok_Tersedia } = req.body;
 
     // Step 1: Buat entri barang tanpa QR_Code dulu
-  const newBarang = await Barang.create({
-  Nama_Barang,
-  Deskripsi,
-  Stok_Tersedia,
-  QR_Code: '', // placeholder sementara
-});
+    const newBarang = await Barang.create({
+      Nama_Barang,
+      Deskripsi,
+      Stok_Tersedia,
+      QR_Code: '', // placeholder sementara
+    });
 
-// Pastikan ID_Barang sudah ada
-if (!newBarang.ID_Barang) {
-  throw new Error("ID_Barang tidak ditemukan setelah pembuatan barang");
-}
+    // Pastikan ID_Barang sudah ada
+    if (!newBarang.ID_Barang) {
+      throw new Error("ID_Barang tidak ditemukan setelah pembuatan barang");
+    }
 
-
-    // Step 2: Generate nama file QR Code
-    const qrFilename = `barang-${newBarang.ID_Barang}.png`;
-
-const qrPath = path.join(process.cwd(), 'public', 'qris', qrFilename);
+    // Step 2: Generate nama file QR Code menggunakan ID_Barang untuk memastikan keunikannya
+    const qrFilename = `barang-${newBarang.ID_Barang}.png`;  // Menggunakan ID_Barang untuk memastikan file unik
+    const qrPath = path.join(process.cwd(), 'public', 'qris', qrFilename);  // Path untuk menyimpan file QR code
 
     // Pastikan folder public/qris ada
     fs.mkdirSync(path.dirname(qrPath), { recursive: true });
@@ -36,22 +34,22 @@ const qrPath = path.join(process.cwd(), 'public', 'qris', qrFilename);
       width: 300,
     });
 
-    // ✅ Gunakan domain tetap (bukan req.get('host'))
-    const qrUrl = `https://skydance.life/qris/${qrFilename}`;
-    newBarang.QR_Code = qrUrl;
+    // Step 4: Simpan path relatif file QR Code di database (tanpa domain)
+    const qrRelativePath = `/qris/${qrFilename}`;  // Simpan path relatif QR Code
+    newBarang.QR_Code = qrRelativePath;
     await newBarang.save();
 
-
     res.status(201).json({
-  message: 'Barang created successfully',
-  data: newBarang, // Pastikan newBarang berisi ID_Barang
-});
+      message: 'Barang created successfully',
+      data: newBarang, // Pastikan newBarang berisi ID_Barang dan QR_Code
+    });
 
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error creating Barang', error });
   }
 };
+
 
 // Read All Barang
 exports.getAllBarang = async (req, res) => {

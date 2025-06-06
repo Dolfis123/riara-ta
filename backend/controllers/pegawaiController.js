@@ -94,5 +94,20 @@ const getAllPegawaiOnly = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const countByRole = async (req, res) => {
+  try {
+    const countPegawai = await Pegawai.count({ where: { Role: 'pegawai' } });
+    const countAdmin = await Pegawai.count({ where: { Role: 'admin' } });
 
-module.exports = { register, login, getAll,getAllPegawaiOnly, update, remove };
+    res.status(200).json({
+      totalPegawai: countPegawai,
+      totalAdmin: countAdmin
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+module.exports = { register, login, getAll,getAllPegawaiOnly, update, remove, countByRole };

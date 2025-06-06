@@ -12,6 +12,7 @@ import ScanQRCode from './pages/Dashboard/ScanQRCode';
 import RiwayatPengambilan from './pages/Dashboard/RiwayatPengambilan';
 import BarangSearch from './pages/Dashboard/BarangSearch';
 import SuperAdmin from './pages/Dashboard/SuperAdmin';
+import Dashboard from './pages/Dashboard/Dashboard';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -59,6 +60,17 @@ function App() {
               <PageTitle title="Barang Dashboard | TailAdmin" />
               <ScanQRCode />
             
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DefaultLayout>
+              <PageTitle title="Barang Dashboard | TailAdmin" />
+              <Dashboard />
+            </DefaultLayout>
           </ProtectedRoute>
         }
       />

@@ -1,4 +1,4 @@
-begini kenapa ini saat di clik qr-code nya data jumlah stok berkurang, seharusnya tidak sepeperti begitu?:import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import QRCode from "qrcode";  // Pastikan Anda sudah install library qrcode
 const API_URL = import.meta.env.VITE_API_URL;

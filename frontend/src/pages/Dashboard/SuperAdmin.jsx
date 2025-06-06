@@ -160,7 +160,7 @@ const [pinError, setPinError] = useState("");
         setSuccessMessage("Data pegawai berhasil ditambahkan.");
       }
   
-      const response = await axios.get(`${API_URL}/pegawai`, {
+      const response = await axios.get(`${API_URL}/pegawai/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
   

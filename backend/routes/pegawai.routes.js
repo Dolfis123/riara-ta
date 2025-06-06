@@ -10,7 +10,7 @@ router.put("/:id", authenticateToken, controller.update);
 router.get('/pegawai-only',authenticateToken , controller.getAllPegawaiOnly);
 // Protected
 router.get('/count-by-role', authenticateToken, controller.countByRole);
-router.get("/", authenticateToken, controller.getAll);
+router.get("/all", authenticateToken, controller.getAll);
 router.put("/:id", authenticateToken, controller.update);
 router.delete("/:id", authenticateToken, controller.remove);
 

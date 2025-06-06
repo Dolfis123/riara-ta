@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useRef, useEffect, useState } from "react";
 import Webcam from "react-webcam";
 import jsQR from "jsqr";
@@ -103,6 +102,10 @@ function ScanQRCode() {
       setJumlahAmbil("");
       setShowSuccessPopup(true);
 
+      // Fetch data barang terbaru dengan QR Code baru
+      const updatedBarang = await axios.get(`${API_URL}/barang/${barang.ID_Barang}`);
+      setBarang(updatedBarang.data);
+
       setTimeout(() => {
         setShowSuccessPopup(false);
         setBarang(null);
@@ -133,6 +136,10 @@ function ScanQRCode() {
               </p>
               <p>
                 <strong>Stok Tersedia:</strong> {barang.Stok_Tersedia}
+              </p>
+              <p>
+                <strong>QR Code:</strong> 
+                <img src={barang.QR_Code} alt="QR Code" className="w-32 h-32" />
               </p>
             </div>
             <div className="mt-6">

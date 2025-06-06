@@ -105,15 +105,13 @@ const Barang = () => {
     }
   };
   
-  
+
 const handleModalSubmit = async (e) => {
   e.preventDefault();
-  console.log('Form submitted'); // Debug
   setIsSubmitting(true);
   setSuccessMessage(""); // Reset pesan
 
   try {
-    console.log('Trying to submit...'); // Debug
     let insertedId;
 
     if (isEditing) {
@@ -131,9 +129,11 @@ const handleModalSubmit = async (e) => {
       setIsModalOpen(false);
     
       try {
+        // Generate QR Code baru setelah data barang ditambahkan
         const qrUrl = `${API_URL}/barang/${insertedId}`;
         const qrCode = await QRCode.toDataURL(qrUrl);
     
+        // Update QR Code yang baru ke barang
         await axios.put(`${API_URL}/barang/${insertedId}`, {
           QR_Code: qrCode,
         });
@@ -144,8 +144,7 @@ const handleModalSubmit = async (e) => {
       setSuccessMessage("Data barang berhasil ditambahkan.");
     }
     
-
-    // Ambil ulang data barang
+    // Ambil ulang data barang setelah submit
     const response = await axios.get(`${API_URL}/barang`);
     setBarangList(response.data);
 
@@ -155,18 +154,14 @@ const handleModalSubmit = async (e) => {
       Deskripsi: "",
       Stok_Tersedia: 0,
     });
-    console.log('Closing modal...'); // Debug
-    setIsModalOpen(false); // Pastikan ini dipanggil
+    setIsModalOpen(false); // Pastikan modal ditutup setelah submit
     setIsEditing(false);
     setCurrentBarang(null);
 
     setTimeout(() => setSuccessMessage(""), 3000);
   } catch (error) {
-    console.error('Error details:', error); // Debug lebih detail
-    const message =
-      error.response?.data?.message || "Gagal menyimpan data barang.";
-    setSuccessMessage(message);
-    console.error("Error saving barang:", message);
+    console.error("Error saving barang:", error);
+    setSuccessMessage("Gagal menyimpan data barang.");
   } finally {
     setIsSubmitting(false);
   }
@@ -183,6 +178,7 @@ const handleModalSubmit = async (e) => {
     });
     setIsEditing(false);
   };
+
 
   return (
     <div className="container mx-auto">

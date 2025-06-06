@@ -41,7 +41,7 @@ const handleLogin = async (e) => {
       if (data.role === 'pegawai') {
         navigate('/scan-qrcode'); // Arahkan pegawai ke halaman scan QR
       } else if (data.role === 'admin') {
-        navigate('/data-pegawai');
+        navigate('/dashboard'); // Arahkan admin ke halaman dashboard
       } else if (data.role === 'super_admin') {
         navigate('/super-admin'); // Arahkan super admin ke halaman super admin
       } else {

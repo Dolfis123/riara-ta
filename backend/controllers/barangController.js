@@ -15,15 +15,15 @@ exports.createBarang = async (req, res) => {
       QR_Code: '', // placeholder sementara
     });
 
-    // Step 2: Generate nama file QR Code
+    // Step 2: Generate nama file QR Code berdasarkan ID_Barang dan Stok_Tersedia
     const qrFilename = `barang-${newBarang.ID_Barang}.png`;
     const qrPath = path.join(__dirname, '..', 'public', 'qris', qrFilename);
 
     // Pastikan folder public/qrcodes ada
     fs.mkdirSync(path.dirname(qrPath), { recursive: true });
 
-    // Step 3: Buat file QR Code yang menyimpan ID_Barang
-    await QRCode.toFile(qrPath, String(newBarang.ID_Barang), {
+    // Step 3: Buat file QR Code yang menyimpan ID_Barang dan Stok_Tersedia
+    await QRCode.toFile(qrPath, `${newBarang.ID_Barang}?stok=${newBarang.Stok_Tersedia}`, {
       errorCorrectionLevel: 'H',
       type: 'png',
       width: 300,
@@ -32,7 +32,6 @@ exports.createBarang = async (req, res) => {
     const qrUrl = `${req.protocol}://${req.get('host')}/api/qris/${qrFilename}`;
     newBarang.QR_Code = qrUrl;
     await newBarang.save();
-    
 
     res.status(201).json({ message: 'Barang created successfully', data: newBarang });
   } catch (error) {
@@ -68,47 +67,47 @@ exports.getBarangById = async (req, res) => {
     }
 };
 
-// Update Barang
-// Update Barang
 exports.updateBarang = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { Nama_Barang, Deskripsi, Stok_Tersedia } = req.body;
-        const barang = await Barang.findByPk(id);
+  try {
+    const { id } = req.params;
+    const { Nama_Barang, Deskripsi, Stok_Tersedia } = req.body;
+    const barang = await Barang.findByPk(id);
 
-        if (!barang) {
-            return res.status(404).json({ message: 'Barang not found' });
-        }
-
-        barang.Nama_Barang = Nama_Barang || barang.Nama_Barang;
-        barang.Deskripsi = Deskripsi || barang.Deskripsi;
-        barang.Stok_Tersedia = Stok_Tersedia || barang.Stok_Tersedia;
-
-        // Generate QR Code baru berdasarkan Stok_Tersedia terbaru
-        const qrFilename = `barang-${barang.ID_Barang}.png`;
-        const qrPath = path.join(__dirname, '..', 'public', 'qris', qrFilename);
-
-        // Pastikan folder public/qrcodes ada
-        fs.mkdirSync(path.dirname(qrPath), { recursive: true });
-
-        // Generate QR code yang mencakup stok barang terbaru
-        await QRCode.toFile(qrPath, `${barang.ID_Barang}?stok=${barang.Stok_Tersedia}`, {
-          errorCorrectionLevel: 'H',
-          type: 'png',
-          width: 300,
-        });
-
-        const qrUrl = `${req.protocol}://${req.get('host')}/api/qris/${qrFilename}`;
-        barang.QR_Code = qrUrl;
-
-        await barang.save();
-
-        res.status(200).json({ message: 'Barang updated successfully', data: barang });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error updating Barang', error });
+    if (!barang) {
+      return res.status(404).json({ message: 'Barang not found' });
     }
+
+    // Update data barang
+    barang.Nama_Barang = Nama_Barang || barang.Nama_Barang;
+    barang.Deskripsi = Deskripsi || barang.Deskripsi;
+    barang.Stok_Tersedia = Stok_Tersedia || barang.Stok_Tersedia;
+
+    // Generate QR Code baru berdasarkan ID_Barang dan stok terbaru
+    const qrFilename = `barang-${barang.ID_Barang}.png`;
+    const qrPath = path.join(__dirname, '..', 'public', 'qris', qrFilename);
+
+    // Pastikan folder public/qrcodes ada
+    fs.mkdirSync(path.dirname(qrPath), { recursive: true });
+
+    // Generate QR code dengan stok terbaru
+    await QRCode.toFile(qrPath, `${barang.ID_Barang}?stok=${barang.Stok_Tersedia}`, {
+      errorCorrectionLevel: 'H',
+      type: 'png',
+      width: 300,
+    });
+
+    const qrUrl = `${req.protocol}://${req.get('host')}/api/qris/${qrFilename}`;
+    barang.QR_Code = qrUrl;
+
+    await barang.save();
+
+    res.status(200).json({ message: 'Barang updated successfully', data: barang });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error updating Barang', error });
+  }
 };
+
 
 // Delete Barang
 exports.deleteBarang = async (req, res) => {

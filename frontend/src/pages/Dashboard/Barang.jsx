@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+begini kenapa ini saat di clik qr-code nya data jumlah stok berkurang, seharusnya tidak sepeperti begitu?:import React, { useState, useEffect } from "react";
 import axios from "axios";
 import QRCode from "qrcode";  // Pastikan Anda sudah install library qrcode
 const API_URL = import.meta.env.VITE_API_URL;
@@ -63,22 +63,18 @@ const Barang = () => {
   };
 const handleScanBarang = async (barangId) => {
   try {
-    // Panggil API untuk menurunkan stok dan memperbarui QR Code
-    const response = await axios.post(`${API_URL}/barang/scan/${barangId}`);
+    // Panggil API untuk mendapatkan data barang berdasarkan ID
+    const response = await axios.get(`${API_URL}/barang/${barangId}`);
     
-    // Ambil barang yang sudah diperbarui (termasuk QR Code baru)
-    const updatedBarang = response.data.data;
-
-    // Update barang yang ditampilkan di UI dengan barang yang baru
-    setBarangList(barangList.map((barang) => 
-      barang.ID_Barang === updatedBarang.ID_Barang ? updatedBarang : barang
-    ));
-
-    console.log('QR Code updated:', updatedBarang.QR_Code); // Debug log
+    // Set data barang yang diperoleh dari API
+    setBarang(response.data);
+    setErrorMsg(""); // Reset pesan error jika berhasil
   } catch (error) {
+    setErrorMsg("QR valid tapi data barang tidak ditemukan.");
     console.error('Error scanning Barang:', error);
   }
 };
+
 
   // Handle Add Barang
   const handleAddClick = () => {
@@ -450,4 +446,4 @@ const handleModalSubmit = async (e) => {
   
 };
 
-export default Barang;
+export default Barang; 

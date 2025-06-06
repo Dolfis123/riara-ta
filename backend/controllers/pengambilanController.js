@@ -130,9 +130,48 @@ function getJumlahBarangDiambil(req, res) {
   });
 }
 
+const { Op } = require('sequelize');
+const RiwayatPengambilan = require('../models/riwayat_pengambilan'); // model anda
+
+// API untuk statistik dengan filter tanggal dinamis
+async function getStatistikByDateRange(req, res) {
+  try {
+    let { startDate, endDate } = req.query;
+
+    // Jika tidak dikirim, default ke hari ini
+    if (!startDate || !endDate) {
+      const now = new Date();
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    } else {
+      startDate = new Date(startDate);
+      endDate = new Date(endDate);
+    }
+
+    // Hitung jumlah transaksi unik dalam rentang waktu
+    const countTransaksi = await RiwayatPengambilan.count({
+      where: {
+        Tanggal: {
+          [Op.gte]: startDate,
+          [Op.lt]: endDate,
+        }
+      },
+      distinct: true,
+      col: 'ID_Transaksi'
+    });
+
+    res.json({ countTransaksi });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Gagal mengambil data statistik' });
+  }
+}
+
+
 
 module.exports = {
   pengambilanBarang,
   getJumlahBarangDiambil,
   getRiwayatPengambilan,
+  getStatistikByDateRange
 };

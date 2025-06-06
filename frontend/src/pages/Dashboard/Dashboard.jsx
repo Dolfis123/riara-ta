@@ -8,6 +8,7 @@ function Dashboard() {
   const [statistik, setStatistik] = useState({ hariIni: 0, bulanIni: 0, tahunIni: 0 });
   const [periode, setPeriode] = useState('default'); // opsi: default, hari, bulan, tahun
 
+  // Fetch data from API on component mount
   useEffect(() => {
     const fetchCounts = async () => {
       try {
@@ -23,7 +24,8 @@ function Dashboard() {
 
     const fetchStatistik = async () => {
       try {
-        const response = await axios.get(`${API_URL}/riwayat/pengambilan/statistik`);
+        // Fetching statistic data from the API to get the count of 'Barang Diambil'
+        const response = await axios.get(`${API_URL}/pengambilan/statistik`);
         setStatistik(response.data);
       } catch (error) {
         console.error("Error fetching statistik pengambilan:", error);
@@ -34,12 +36,12 @@ function Dashboard() {
     fetchStatistik();
   }, []);
 
-  // Fungsi untuk menentukan nilai berdasarkan periode yang dipilih
+  // Function to determine value based on selected period
   const getStatistikValue = () => {
     if (periode === 'hari') return { label: 'Hari Ini', value: statistik.hariIni };
     if (periode === 'bulan') return { label: 'Bulan Ini', value: statistik.bulanIni };
     if (periode === 'tahun') return { label: 'Tahun Ini', value: statistik.tahunIni };
-    // default: tampilkan semua
+    // Default: show all
     return [
       { label: 'Hari Ini', value: statistik.hariIni },
       { label: 'Bulan Ini', value: statistik.bulanIni },

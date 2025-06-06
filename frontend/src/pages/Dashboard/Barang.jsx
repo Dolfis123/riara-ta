@@ -69,6 +69,12 @@ const handleScanBarang = async (barangId) => {
     // Set data barang yang diperoleh dari API
     setBarang(response.data);
     setErrorMsg(""); // Reset pesan error jika berhasil
+
+    // Panggil API untuk memperbarui gambar QR Code tanpa mengurangi stok
+    const scanResponse = await axios.post(`${API_URL}/barang/scan/${barangId}`);
+
+    // Update UI dengan data terbaru setelah QR code diperbarui
+    setBarang(scanResponse.data.data);
   } catch (error) {
     setErrorMsg("QR valid tapi data barang tidak ditemukan.");
     console.error('Error scanning Barang:', error);

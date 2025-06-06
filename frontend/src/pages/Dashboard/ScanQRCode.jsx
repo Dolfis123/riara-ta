@@ -41,18 +41,30 @@ const scanQRCode = () => {
       setLastScannedId(id);
       beep.play();
 
+      // Panggil API untuk mengurangi stok secara otomatis
       axios
-        .get(`${API_URL}/barang/${id}`)
+        .post(`${API_URL}/barang/scan/${id}`)
         .then((res) => {
-          setBarang(res.data);  // Set data barang setelah QR code dipindai
-          setErrorMsg("");
+          const updatedBarang = res.data.data;
+
+          // Update barang yang ditampilkan di UI dengan barang yang baru
+          setBarangList(
+            barangList.map((barang) =>
+              barang.ID_Barang === updatedBarang.ID_Barang
+                ? updatedBarang
+                : barang
+            )
+          );
+
+          console.log("QR Code updated:", updatedBarang.QR_Code); // Debug log
         })
-        .catch(() => {
-          setErrorMsg("QR valid tapi data barang tidak ditemukan.");
+        .catch((err) => {
+          console.error("Error scanning Barang:", err);
         });
     }
   }
 };
+
 
 
   useEffect(() => {

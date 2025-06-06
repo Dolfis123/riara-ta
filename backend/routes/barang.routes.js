@@ -1,12 +1,23 @@
 const express = require('express');
 const router = express.Router();
+const upload = require('../config/multer'); // Mengimpor konfigurasi Multer
 const barangController = require('../controllers/barangController');
 
-router.get('/', barangController.getAllBarang);
-router.get('/:id', barangController.getBarangById);
-router.post('/', barangController.createBarang);
-router.put('/:id', barangController.updateBarang);
-router.delete('/:id', barangController.deleteBarang)
+// Create Barang
+router.post('/barang', upload.single('QR_Code'), barangController.createBarang);
+
+// Get All Barang
+router.get('/barang', barangController.getAllBarang);
+
+// Get Barang by ID
+router.get('/barang/:id', barangController.getBarangById);
+
+// Update Barang
+router.put('/barang/:id', upload.single('QR_Code'), barangController.updateBarang);
+
+// Delete Barang
+router.delete('/barang/:id', barangController.deleteBarang);
+
 
 router.get('/search', barangController.searchBarangByNama);
 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import QRCode from "qrcode";  // Pastikan Anda sudah install library qrcode
-const API_URL = import.meta.env.VITE_API_URL;
 
 const Barang = () => {
   const [barangList, setBarangList] = useState([]);
@@ -43,7 +42,7 @@ const Barang = () => {
   useEffect(() => {
     const fetchBarang = async () => {
       try {
-        const response = await axios.get(`${API_URL}/barang`);
+        const response = await axios.get("http://localhost:7070/api/barang");
         setBarangList(response.data); // Set hasil data ke state
       } catch (error) {
         console.error("Error fetching barang", error);
@@ -95,7 +94,7 @@ const Barang = () => {
     if (!barangToDelete) return; // Tambahkan pengecekan agar tidak melakukan operasi saat barangToDelete masih null
   
     try {
-      await axios.delete(`${API_URL}/barang/${barangToDelete.ID_Barang}`);
+      await axios.delete(`http://localhost:7070/api/barang/${barangToDelete.ID_Barang}`);
       setBarangList(barangList.filter((barang) => barang.ID_Barang !== barangToDelete.ID_Barang));
       setSuccessMessage("Data barang berhasil dihapus.");
       setIsConfirmModalOpen(false); // Tutup modal konfirmasi setelah berhasil
@@ -105,59 +104,68 @@ const Barang = () => {
     }
   };
   
+  
 const handleModalSubmit = async (e) => {
   e.preventDefault();
+  console.log('Form submitted'); // Debug
   setIsSubmitting(true);
-  setSuccessMessage(""); // Reset pesan sukses
+  setSuccessMessage(""); // Reset pesan
 
   try {
+    console.log('Trying to submit...'); // Debug
     let insertedId;
-    
+
     if (isEditing) {
-      // Update Barang
-      await axios.put(`${API_URL}/barang/${currentBarang.ID_Barang}`, formData);
+      await axios.put(
+        `http://localhost:7070/api/barang/${currentBarang.ID_Barang}`,
+        formData
+      );
       setSuccessMessage("Data barang berhasil diedit.");
-      setIsModalOpen(false);
+      setIsModalOpen(false); // Tutup setelah berhasil edit
     } else {
-      // Tambah Barang
-      const res = await axios.post(`${API_URL}/barang`, formData);
-
-      // Pastikan response mengembalikan ID_Barang yang valid
-      insertedId = res.data.data.ID_Barang;
-      if (!insertedId) {
-        console.error("Error: insertedId is undefined");
-        return; // Berhenti jika ID_Barang tidak ada
-      }
-
+      const res = await axios.post("http://localhost:7070/api/barang", formData);
+      insertedId = res.data.ID_Barang;
+    
+      // Tutup modal lebih awal agar tetap tertutup meskipun QR gagal
       setIsModalOpen(false);
     
-      // Generate QR code dan simpan
-      const qrUrl = `${API_URL}/barang/${insertedId}`;
-      const qrCode = await QRCode.toDataURL(qrUrl);
+      try {
+        const qrUrl = `http://localhost:5173/api/barang/${insertedId}`;
+        const qrCode = await QRCode.toDataURL(qrUrl);
     
-      await axios.put(`${API_URL}/barang/${insertedId}`, {
-        QR_Code: qrCode,
-      });
-
+        await axios.put(`http://localhost:7070/api/barang/${insertedId}`, {
+          QR_Code: qrCode,
+        });
+      } catch (qrError) {
+        console.warn("QR code generation failed:", qrError);
+      }
+    
       setSuccessMessage("Data barang berhasil ditambahkan.");
     }
+    
 
-    // Ambil ulang data barang setelah operasi
-    const response = await axios.get(`${API_URL}/barang`);
+    // Ambil ulang data barang
+    const response = await axios.get("http://localhost:7070/api/barang");
     setBarangList(response.data);
 
-    // Reset form
+    // Reset form dan tutup modal
     setFormData({
       Nama_Barang: "",
       Deskripsi: "",
       Stok_Tersedia: 0,
     });
+    console.log('Closing modal...'); // Debug
+    setIsModalOpen(false); // Pastikan ini dipanggil
     setIsEditing(false);
     setCurrentBarang(null);
 
+    setTimeout(() => setSuccessMessage(""), 3000);
   } catch (error) {
-    console.error("Error saving barang:", error);
-    setSuccessMessage("Gagal menyimpan data barang.");
+    console.error('Error details:', error); // Debug lebih detail
+    const message =
+      error.response?.data?.message || "Gagal menyimpan data barang.";
+    setSuccessMessage(message);
+    console.error("Error saving barang:", message);
   } finally {
     setIsSubmitting(false);
   }
@@ -246,17 +254,15 @@ const handleModalSubmit = async (e) => {
               <td className="border px-4 py-2">{barang.Deskripsi}</td>
               <td className="border px-4 py-2">{barang.Stok_Tersedia}</td>
               <td className="border px-4 py-2">
-
-<td className="border px-4 py-2">
   {barang.QR_Code && (
     <div className="relative group w-20 h-20">
       <img
-        src={barang.QR_Code}  // Menggunakan path relatif yang disimpan di database
+        src={barang.QR_Code}
         alt="QR Code"
         className="w-full h-full object-contain"
       />
       <a
-        href={barang.QR_Code}  // Menggunakan path relatif untuk link download
+        href={barang.QR_Code}
         download={`QRCode_${barang.Nama_Barang}.png`}
         className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
@@ -277,11 +283,6 @@ const handleModalSubmit = async (e) => {
       </a>
     </div>
   )}
-</td>
-
-
-
-
 </td>
 
               <td className="border px-4 py-2">

@@ -15,35 +15,26 @@ exports.createBarang = async (req, res) => {
       QR_Code: '', // placeholder sementara
     });
 
-    // Pastikan ID_Barang sudah ada
-    if (!newBarang.ID_Barang) {
-      throw new Error("ID_Barang tidak ditemukan setelah pembuatan barang");
-    }
+    // Step 2: Generate nama file QR Code
+    const qrFilename = `barang-${newBarang.ID_Barang}.png`;
+    const qrPath = path.join(__dirname, '..', 'public', 'qris', qrFilename);
 
-    // Step 2: Generate nama file QR Code menggunakan ID_Barang untuk memastikan keunikannya
-    const qrFilename = `barang-${newBarang.ID_Barang}.png`;  // Menggunakan ID_Barang untuk memastikan file unik
-    const qrPath = path.join(process.cwd(), 'public', 'qris', qrFilename);  // Path untuk menyimpan file QR code
-
-    // Pastikan folder public/qris ada
+    // Pastikan folder public/qrcodes ada
     fs.mkdirSync(path.dirname(qrPath), { recursive: true });
 
-    // Step 3: Buat QR Code yang menyimpan ID_Barang
+    // Step 3: Buat file QR Code yang menyimpan ID_Barang
     await QRCode.toFile(qrPath, String(newBarang.ID_Barang), {
       errorCorrectionLevel: 'H',
       type: 'png',
       width: 300,
     });
 
-    // Step 4: Simpan path relatif file QR Code di database (tanpa domain)
-    const qrRelativePath = `/qris/${qrFilename}`;  // Simpan path relatif QR Code
-    newBarang.QR_Code = qrRelativePath;
+    const qrUrl = `${req.protocol}://${req.get('host')}/qris/${qrFilename}`;
+    newBarang.QR_Code = qrUrl;
     await newBarang.save();
+    
 
-    res.status(201).json({
-      message: 'Barang created successfully',
-      data: newBarang, // Pastikan newBarang berisi ID_Barang dan QR_Code
-    });
-
+    res.status(201).json({ message: 'Barang created successfully', data: newBarang });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error creating Barang', error });
@@ -51,59 +42,78 @@ exports.createBarang = async (req, res) => {
 };
 
 
-// Get all
+// Read All Barang
 exports.getAllBarang = async (req, res) => {
-  try {
-    const barang = await Barang.findAll();
-    res.json(barang);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    try {
+        const barangList = await Barang.findAll();
+        res.status(200).json(barangList);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error fetching Barang', error });
+    }
 };
 
-// Get by ID
+// Read Single Barang
 exports.getBarangById = async (req, res) => {
-  try {
-    const barang = await Barang.findByPk(req.params.id);
-    if (!barang) return res.status(404).json({ message: 'Barang tidak ditemukan' });
-    res.json(barang);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    try {
+        const { id } = req.params;
+        const barang = await Barang.findByPk(id);
+        if (!barang) {
+            return res.status(404).json({ message: 'Barang not found' });
+        }
+        res.status(200).json(barang);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error fetching Barang', error });
+    }
 };
-// Update
+
+// Update Barang
 exports.updateBarang = async (req, res) => {
-  try {
-    const barang = await Barang.findByPk(req.params.id);
-    if (!barang) return res.status(404).json({ message: 'Barang tidak ditemukan' });
+    try {
+        const { id } = req.params;
+        const { Nama_Barang, Deskripsi, Stok_Tersedia } = req.body;
+        const barang = await Barang.findByPk(id);
 
-    const { Nama_Barang, Deskripsi, Stok_Tersedia } = req.body;
+        if (!barang) {
+            return res.status(404).json({ message: 'Barang not found' });
+        }
 
-    await barang.update({
-      Nama_Barang,
-      Deskripsi,
-      Stok_Tersedia,
-    });
+        barang.Nama_Barang = Nama_Barang || barang.Nama_Barang;
+        barang.Deskripsi = Deskripsi || barang.Deskripsi;
+        barang.Stok_Tersedia = Stok_Tersedia || barang.Stok_Tersedia;
 
-    res.json(barang);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+        // Jika ada QR Code baru yang di-upload
+        if (req.file) {
+            barang.QR_Code = req.file.filename;
+        }
+
+        await barang.save();
+
+        res.status(200).json({ message: 'Barang updated successfully', data: barang });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error updating Barang', error });
+    }
 };
 
-// Delete
+// Delete Barang
 exports.deleteBarang = async (req, res) => {
-  try {
-    const barang = await Barang.findByPk(req.params.id);
-    if (!barang) return res.status(404).json({ message: 'Barang tidak ditemukan' });
+    try {
+        const { id } = req.params;
+        const barang = await Barang.findByPk(id);
 
-    await barang.destroy();
-    res.json({ message: 'Barang berhasil dihapus' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+        if (!barang) {
+            return res.status(404).json({ message: 'Barang not found' });
+        }
+
+        await barang.destroy();
+        res.status(200).json({ message: 'Barang deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error deleting Barang', error });
+    }
 };
-
 const { Op } = require('sequelize');
 
 exports.searchBarangByNama = async (req, res) => {

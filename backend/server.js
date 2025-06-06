@@ -25,29 +25,18 @@ app.use(
 
 app.use(
   cors({
-    origin: function(origin, callback) {
-      const allowedOrigins = ['https://skydance.life', 'https://www.skydance.life', 'http://localhost:5173'];
-      
-      // Jika request tidak punya origin (misal Postman atau server-to-server), kita izinkan juga (opsional)
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
+    origin: "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
 
+
 // Serve static files (QR Code images)
-app.use('/qris', express.static(path.join(__dirname, 'public', 'qris')));
-app.use('/qris', express.static('public/qris'));
+app.use('/api/qris', express.static(path.join(__dirname, 'public', 'qris')));
 
 // PATH untuk menyimpan QR Code
-app.use('/api/barang', barangRoutes); // Rute untuk barang
+app.use('/api', barangRoutes); // Rute untuk barang
 // app.use('/api', pegawaiRoutes); // Rute untuk pegawai
 app.use('/api/riwayat', riwayatPengambilanRoutes);  // Menambahkan riwayat pengambilan routes
 app.use('/api/auth', authRoutes);

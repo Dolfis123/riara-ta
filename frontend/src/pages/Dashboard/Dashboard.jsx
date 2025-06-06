@@ -25,7 +25,7 @@ function Dashboard() {
       setRoleCounts(pegawaiRes.data);
 
       // Fetch transaksi count
-      const transaksiRes = await axios.get(`${API_URL}/pengambilan/statistik`, {
+      const transaksiRes = await axios.get(`${API_URL}/riwayat/pengambilan/statistik`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTransaksiCounts(transaksiRes.data);

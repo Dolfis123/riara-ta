@@ -23,7 +23,7 @@ function Dashboard() {
 
     const fetchStatistik = async () => {
       try {
-        const response = await axios.get(`${API_URL}/pengambilan/statistik`);
+        const response = await axios.get(`${API_URL}/riwayat/pengambilan/statistik`);
         setStatistik(response.data);
       } catch (error) {
         console.error("Error fetching statistik pengambilan:", error);

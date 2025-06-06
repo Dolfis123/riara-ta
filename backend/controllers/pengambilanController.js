@@ -126,16 +126,9 @@ function getJumlahBarangDiambil(req, res) {
   });
 }
 
-// Dummy fungsi pengambilanBarang
-function pengambilanBarang(req, res) {
-  res.status(200).json({ message: 'Pengambilan barang berhasil' });
-}
 
-// Dummy fungsi getRiwayatPengambilan
-function getRiwayatPengambilan(req, res) {
-  // Contoh data riwayat
-  res.status(200).json({ riwayat: [] });
-}
+
+
 
 module.exports = {
   pengambilanBarang,

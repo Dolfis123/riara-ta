@@ -75,7 +75,6 @@ const handleScanBarang = async (barangId) => {
   }
 };
 
-
   // Handle Add Barang
   const handleAddClick = () => {
     setIsEditing(false);
@@ -446,4 +445,4 @@ const handleModalSubmit = async (e) => {
   
 };
 
-export default Barang; 
+export default Barang;

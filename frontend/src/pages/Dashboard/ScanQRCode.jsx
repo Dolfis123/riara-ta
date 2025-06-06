@@ -20,7 +20,6 @@ function ScanQRCode() {
   const [cameraFacingMode, setCameraFacingMode] = useState("environment");
 
   const beep = new Audio(beepSound);
-
 const scanQRCode = () => {
   const canvas = canvasRef.current;
   const video = webcamRef.current.video;
@@ -113,6 +112,7 @@ const handleAmbilBarang = async () => {
     setErrorMsg("❌ Gagal mengambil barang.");
   }
 };
+
 
 
   const switchCamera = () => {

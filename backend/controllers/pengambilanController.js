@@ -67,10 +67,8 @@ const getRiwayatPengambilan = async (req, res) => {
   }
 };
 
+const { Op, fn, col } = require('sequelize');
 
-const { Op } = require('sequelize');
-
-// Fungsi hitung jumlah barang diambil hari, bulan, tahun ini
 function getJumlahBarangDiambil(req, res) {
   const now = new Date();
 
@@ -88,7 +86,9 @@ function getJumlahBarangDiambil(req, res) {
   const akhirTahun = new Date(now.getFullYear() + 1, 0, 1);
 
   Promise.all([
-    RiwayatPengambilan.sum('Jumlah_Diambil', {
+    RiwayatPengambilan.count({
+      distinct: true,
+      col: 'ID_Transaksi',
       where: {
         Tanggal: {
           [Op.gte]: awalHari,
@@ -96,7 +96,9 @@ function getJumlahBarangDiambil(req, res) {
         },
       },
     }),
-    RiwayatPengambilan.sum('Jumlah_Diambil', {
+    RiwayatPengambilan.count({
+      distinct: true,
+      col: 'ID_Transaksi',
       where: {
         Tanggal: {
           [Op.gte]: awalBulan,
@@ -104,7 +106,9 @@ function getJumlahBarangDiambil(req, res) {
         },
       },
     }),
-    RiwayatPengambilan.sum('Jumlah_Diambil', {
+    RiwayatPengambilan.count({
+      distinct: true,
+      col: 'ID_Transaksi',
       where: {
         Tanggal: {
           [Op.gte]: awalTahun,
@@ -121,13 +125,10 @@ function getJumlahBarangDiambil(req, res) {
     });
   })
   .catch((error) => {
-    console.error('Gagal menghitung jumlah barang:', error);
+    console.error('Gagal menghitung jumlah transaksi:', error);
     res.status(500).json({ message: 'Terjadi kesalahan server' });
   });
 }
-
-
-
 
 
 module.exports = {

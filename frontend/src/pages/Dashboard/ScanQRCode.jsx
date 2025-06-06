@@ -20,52 +20,40 @@ function ScanQRCode() {
   const [cameraFacingMode, setCameraFacingMode] = useState("environment");
 
   const beep = new Audio(beepSound);
-const scanQRCode = () => {
-  const canvas = canvasRef.current;
-  const video = webcamRef.current.video;
 
-  if (video && canvas) {
-    const ctx = canvas.getContext("2d");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const scanQRCode = () => {
+    const canvas = canvasRef.current;
+    const video = webcamRef.current.video;
 
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(imageData.data, canvas.width, canvas.height);
+    if (video && canvas) {
+      const ctx = canvas.getContext("2d");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    if (code && code.data) {
-      const id = code.data.split("/").pop();
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, canvas.width, canvas.height);
 
-      if (id === lastScannedId) return;
+      if (code && code.data) {
+        const id = code.data.split("/").pop();
 
-      setLastScannedId(id);
-      beep.play();
+        if (id === lastScannedId) return;
 
-      // Panggil API untuk mengurangi stok secara otomatis
-      axios
-        .post(`${API_URL}/barang/scan/${id}`)
-        .then((res) => {
-          const updatedBarang = res.data.data;
+        setLastScannedId(id);
+        beep.play();
 
-          // Update barang yang ditampilkan di UI dengan barang yang baru
-          setBarangList(
-            barangList.map((barang) =>
-              barang.ID_Barang === updatedBarang.ID_Barang
-                ? updatedBarang
-                : barang
-            )
-          );
-
-          console.log("QR Code updated:", updatedBarang.QR_Code); // Debug log
-        })
-        .catch((err) => {
-          console.error("Error scanning Barang:", err);
-        });
+        axios
+          .get(`${API_URL}/barang/${id}`)
+          .then((res) => {
+            setBarang(res.data);
+            setErrorMsg("");
+          })
+          .catch(() => {
+            setErrorMsg("QR valid tapi data barang tidak ditemukan.");
+          });
+      }
     }
-  }
-};
-
-
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -74,58 +62,56 @@ const scanQRCode = () => {
     return () => clearInterval(interval);
   }, [barang]);
 
-const handleAmbilBarang = async () => {
-  const jumlah = parseInt(jumlahAmbil);
-  if (!jumlah || isNaN(jumlah) || jumlah < 1) {
-    setErrorMsg("Masukkan jumlah yang valid.");
-    return;
-  }
+  const handleAmbilBarang = async () => {
+    const jumlah = parseInt(jumlahAmbil);
+    if (!jumlah || isNaN(jumlah) || jumlah < 1) {
+      setErrorMsg("Masukkan jumlah yang valid.");
+      return;
+    }
 
-  if (barang.Stok_Tersedia <= 0) {
-    setErrorMsg("❌ Stok barang habis.");
-    return;
-  }
+    if (barang.Stok_Tersedia <= 0) {
+      setErrorMsg("❌ Stok barang habis.");
+      return;
+    }
 
-  if (jumlah > barang.Stok_Tersedia) {
-    setErrorMsg("❌ Jumlah melebihi stok tersedia.");
-    return;
-  }
+    if (jumlah > barang.Stok_Tersedia) {
+      setErrorMsg("❌ Jumlah melebihi stok tersedia.");
+      return;
+    }
 
-  const idPegawai = localStorage.getItem("ID_Pegawai");
-  if (!idPegawai) {
-    setErrorMsg("ID Pegawai tidak ditemukan. Silakan login.");
-    return;
-  }
+    const idPegawai = localStorage.getItem("ID_Pegawai");
+    if (!idPegawai) {
+      setErrorMsg("ID Pegawai tidak ditemukan. Silakan login.");
+      return;
+    }
 
-  try {
-    const res = await axios.post(
-      `${API_URL}/barang/pengambilan`,
-      {
-        ID_Barang: barang.ID_Barang,
-        Jumlah_Diambil: jumlah,
-        ID_Pegawai: idPegawai,
-      }
-    );
+    try {
+      const res = await axios.post(
+        `${API_URL}/barang/pengambilan`,
+        {
+          ID_Barang: barang.ID_Barang,
+          Jumlah_Diambil: jumlah,
+          ID_Pegawai: idPegawai,
+        }
+      );
 
-    const riwayat = res.data.riwayat;
-    setBarang({ ...barang, Stok_Tersedia: barang.Stok_Tersedia - jumlah });
-    setSuccessMsg(
-      `✅ Barang berhasil diambil. ID Transaksi: ${riwayat.ID_Transaksi}`
-    );
-    setJumlahAmbil("");
-    setShowSuccessPopup(true);
+      const riwayat = res.data.riwayat;
+      setBarang({ ...barang, Stok_Tersedia: barang.Stok_Tersedia - jumlah });
+      setSuccessMsg(
+        `✅ Barang berhasil diambil. ID Transaksi: ${riwayat.ID_Transaksi}`
+      );
+      setJumlahAmbil("");
+      setShowSuccessPopup(true);
 
-    setTimeout(() => {
-      setShowSuccessPopup(false);
-      setBarang(null);
-      setLastScannedId(null);
-    }, 3000);
-  } catch (err) {
-    setErrorMsg("❌ Gagal mengambil barang.");
-  }
-};
-
-
+      setTimeout(() => {
+        setShowSuccessPopup(false);
+        setBarang(null);
+        setLastScannedId(null);
+      }, 3000);
+    } catch (err) {
+      setErrorMsg("❌ Gagal mengambil barang.");
+    }
+  };
 
   const switchCamera = () => {
     setCameraFacingMode((prev) =>

@@ -18,10 +18,7 @@ router.put('/barang/:id', upload.single('QR_Code'), barangController.updateBaran
 // Delete Barang
 router.delete('/barang/:id', barangController.deleteBarang);
 
-// Pencarian Barang berdasarkan Nama
-router.get('/search', barangController.searchBarangByNama);
 
-// **Route baru untuk menangani pemindaian QR Code dan mengurangi stok**
-router.post('/barang/scan/:id', barangController.scanBarang); // Scan untuk memperbarui stok dan QR Code
+router.get('/search', barangController.searchBarangByNama);
 
 module.exports = router;

@@ -298,12 +298,12 @@ const handleModalSubmit = async (e) => {
         </svg>
       </a>
       {/* Tombol untuk scan dan perbarui stok */}
-      {/* <button
+      <button
         onClick={() => handleScanBarang(barang.ID_Barang)}
         className="absolute inset-0 flex items-center justify-center bg-blue-500 bg-opacity-50 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
         Scan
-      </button> */}
+      </button>
     </div>
   )}
 </td>

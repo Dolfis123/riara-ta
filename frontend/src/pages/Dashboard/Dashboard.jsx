@@ -5,8 +5,8 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 function Dashboard() {
   const [roleCounts, setRoleCounts] = useState({ totalPegawai: 0, totalAdmin: 0 });
-  const [statistik, setStatistik] = useState({ hariIni: 0, bulanIni: 0, tahunIni: 0 });
-  const [periode, setPeriode] = useState('default'); // opsi: default, hari, bulan, tahun
+  const [statistik, setStatistik] = useState({ hariIni: 0, bulanIni: 0, tahunIni: 0, hariLalu: 0, bulanLalu: 0, tahunLalu: 0 });
+  const [periode, setPeriode] = useState('default'); // opsi: default, hari, bulan, tahun, hari-lalu, bulan-lalu, tahun-lalu
 
   // Fetch data from API on component mount
   useEffect(() => {
@@ -41,11 +41,17 @@ function Dashboard() {
     if (periode === 'hari') return { label: 'Hari Ini', value: statistik.hariIni };
     if (periode === 'bulan') return { label: 'Bulan Ini', value: statistik.bulanIni };
     if (periode === 'tahun') return { label: 'Tahun Ini', value: statistik.tahunIni };
+    if (periode === 'hari-lalu') return { label: 'Hari Lalu', value: statistik.hariLalu };
+    if (periode === 'bulan-lalu') return { label: 'Bulan Lalu', value: statistik.bulanLalu };
+    if (periode === 'tahun-lalu') return { label: 'Tahun Lalu', value: statistik.tahunLalu };
     // Default: show all
     return [
       { label: 'Hari Ini', value: statistik.hariIni },
       { label: 'Bulan Ini', value: statistik.bulanIni },
-      { label: 'Tahun Ini', value: statistik.tahunIni }
+      { label: 'Tahun Ini', value: statistik.tahunIni },
+      { label: 'Hari Lalu', value: statistik.hariLalu },
+      { label: 'Bulan Lalu', value: statistik.bulanLalu },
+      { label: 'Tahun Lalu', value: statistik.tahunLalu },
     ];
   };
 
@@ -87,6 +93,9 @@ function Dashboard() {
           <option value="hari">Hanya Hari Ini</option>
           <option value="bulan">Hanya Bulan Ini</option>
           <option value="tahun">Hanya Tahun Ini</option>
+          <option value="hari-lalu">Hari Lalu</option>
+          <option value="bulan-lalu">Bulan Lalu</option>
+          <option value="tahun-lalu">Tahun Lalu</option>
         </select>
       </div>
 

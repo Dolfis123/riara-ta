@@ -40,7 +40,7 @@ function Dashboard() {
       const { startDate, endDate } = customDate;
       if (!startDate || !endDate) return;
 
-      const response = await axios.get(`${API_URL}/pengambilan/statistik`, {
+      const response = await axios.get(`${API_URL}/riwayat/pengambilan/statistik`, {
         params: { startDate, endDate },
         headers: { Authorization: `Bearer ${token}` }
       });

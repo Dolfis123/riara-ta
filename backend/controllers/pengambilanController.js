@@ -2,6 +2,7 @@ const moment = require('moment-timezone');
 const { RiwayatPengambilan, Barang, Pegawai } = require('../models');
 const { Op } = require('sequelize');
 
+
 // Fungsi untuk menghitung pengambilan berdasarkan waktu (sesuaikan timezone WIT)
 const getStatistikPengambilan = async (req, res) => {
   try {
@@ -94,14 +95,17 @@ const pengambilanBarang = async (req, res) => {
     await barang.save();
 
     // Simpan waktu saat ini dengan timezone WIT
-    const waktuWIT = moment().tz('Asia/Jayapura').toDate();
+    // const waktuWIT = moment().tz('Asia/Jayapura').toDate();
+const dateUTC = new Date();
+const dateWIT = new Date(dateUTC.getTime() + 9 * 60 * 60 * 1000);
 
-    const riwayat = await RiwayatPengambilan.create({
-      ID_Barang,
-      ID_Pegawai,
-      Jumlah_Diambil,
-      Tanggal: waktuWIT
-    });
+const riwayat = await RiwayatPengambilan.create({
+  ID_Barang,
+  ID_Pegawai,
+  Jumlah_Diambil,
+  Tanggal: dateWIT
+});
+
 
     res.status(200).json({
       message: 'Pengambilan barang berhasil',

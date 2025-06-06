@@ -1,27 +1,33 @@
+const moment = require('moment-timezone');
 const { RiwayatPengambilan, Barang, Pegawai } = require('../models');
 const { Op } = require('sequelize');
 
-// Fungsi untuk menghitung pengambilan berdasarkan waktu
+// Fungsi untuk menghitung pengambilan berdasarkan waktu (sesuaikan timezone WIT)
 const getStatistikPengambilan = async (req, res) => {
   try {
-    const today = new Date();
-    const startOfToday = new Date(today.setHours(0, 0, 0, 0));
-    const endOfToday = new Date(today.setHours(23, 59, 59, 999));
+    const nowWIT = moment().tz('Asia/Jayapura');
 
-    const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-    const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0, 23, 59, 59, 999);
+    const startOfToday = nowWIT.clone().startOf('day').toDate();
+    const endOfToday = nowWIT.clone().endOf('day').toDate();
 
-    const startOfYear = new Date(new Date().getFullYear(), 0, 1);
-    const endOfYear = new Date(new Date().getFullYear(), 11, 31, 23, 59, 59, 999);
+    const startOfMonth = nowWIT.clone().startOf('month').toDate();
+    const endOfMonth = nowWIT.clone().endOf('month').toDate();
+
+    const startOfYear = nowWIT.clone().startOf('year').toDate();
+    const endOfYear = nowWIT.clone().endOf('year').toDate();
 
     // Custom date range dari query (opsional)
     const { startDate, endDate } = req.query;
     let customRangeFilter = {};
 
     if (startDate && endDate) {
+      // Pastikan juga timezone-nya WIT
+      const startCustom = moment.tz(startDate, 'Asia/Jayapura').startOf('day').toDate();
+      const endCustom = moment.tz(endDate, 'Asia/Jayapura').endOf('day').toDate();
+
       customRangeFilter = {
         Tanggal: {
-          [Op.between]: [new Date(startDate), new Date(endDate)]
+          [Op.between]: [startCustom, endCustom]
         }
       };
     }
@@ -66,18 +72,16 @@ const getStatistikPengambilan = async (req, res) => {
   }
 };
 
-// Controller untuk pengambilan barang
+// Controller untuk pengambilan barang (simpan waktu pakai WIT)
 const pengambilanBarang = async (req, res) => {
   const { ID_Barang, Jumlah_Diambil, ID_Pegawai } = req.body;
 
   try {
-    // Cek apakah barang ada
     const barang = await Barang.findByPk(ID_Barang);
     if (!barang) {
       return res.status(404).json({ message: 'Barang tidak ditemukan' });
     }
 
-    // Validasi stok
     if (barang.Stok_Tersedia <= 0) {
       return res.status(400).json({ message: 'Stok barang habis' });
     }
@@ -86,16 +90,17 @@ const pengambilanBarang = async (req, res) => {
       return res.status(400).json({ message: 'Jumlah diambil melebihi stok tersedia' });
     }
 
-    // Kurangi stok barang
     barang.Stok_Tersedia -= Jumlah_Diambil;
     await barang.save();
 
-    // Simpan riwayat pengambilan
+    // Simpan waktu saat ini dengan timezone WIT
+    const waktuWIT = moment().tz('Asia/Jayapura').toDate();
+
     const riwayat = await RiwayatPengambilan.create({
       ID_Barang,
       ID_Pegawai,
       Jumlah_Diambil,
-      Tanggal: new Date() // pastikan field 'Tanggal' ada di model
+      Tanggal: waktuWIT
     });
 
     res.status(200).json({
@@ -109,29 +114,7 @@ const pengambilanBarang = async (req, res) => {
   }
 };
 
-// Controller untuk menampilkan riwayat pengambilan
-const getRiwayatPengambilan = async (req, res) => {
-  try {
-    const riwayat = await RiwayatPengambilan.findAll({
-      include: [
-        {
-          model: Barang,
-          attributes: ['Nama_Barang']
-        },
-        {
-          model: Pegawai,
-          attributes: ['Nama_Pegawai']
-        }
-      ],
-      order: [['Tanggal', 'DESC']]
-    });
-
-    res.status(200).json({ riwayat });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Gagal mengambil data riwayat pengambilan.' });
-  }
-};
+// Fungsi getStatistikByDate juga disesuaikan timezone WIT
 const getStatistikByDate = async (req, res) => {
   try {
     const { tanggal } = req.query;
@@ -140,18 +123,18 @@ const getStatistikByDate = async (req, res) => {
       return res.status(400).json({ message: 'Tanggal tidak boleh kosong.' });
     }
 
-    // Pisahkan komponen tanggal dari string input (YYYY-MM-DD)
-    const [year, month, day] = tanggal.split('-').map(Number);
+    // Parsing tanggal input sesuai WIT
+    const startOfDay = moment.tz(tanggal, 'YYYY-MM-DD', 'Asia/Jayapura').startOf('day').toDate();
+    const endOfDay = moment.tz(tanggal, 'YYYY-MM-DD', 'Asia/Jayapura').endOf('day').toDate();
 
-    // Bangun rentang hari itu tanpa mengubah waktu lokal
-    const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
-    const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
+    const year = moment(tanggal).year();
+    const month = moment(tanggal).month();
 
-    const startOfMonth = new Date(year, month - 1, 1);
-    const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+    const startOfMonth = moment.tz([year, month], 'Asia/Jayapura').startOf('month').toDate();
+    const endOfMonth = moment.tz([year, month], 'Asia/Jayapura').endOf('month').toDate();
 
-    const startOfYear = new Date(year, 0, 1);
-    const endOfYear = new Date(year, 11, 31, 23, 59, 59, 999);
+    const startOfYear = moment.tz([year], 'Asia/Jayapura').startOf('year').toDate();
+    const endOfYear = moment.tz([year], 'Asia/Jayapura').endOf('year').toDate();
 
     const dayCount = await RiwayatPengambilan.count({
       where: {
@@ -189,7 +172,29 @@ const getStatistikByDate = async (req, res) => {
   }
 };
 
+// Controller untuk menampilkan riwayat pengambilan
+const getRiwayatPengambilan = async (req, res) => {
+  try {
+    const riwayat = await RiwayatPengambilan.findAll({
+      include: [
+        {
+          model: Barang,
+          attributes: ['Nama_Barang']
+        },
+        {
+          model: Pegawai,
+          attributes: ['Nama_Pegawai']
+        }
+      ],
+      order: [['Tanggal', 'DESC']]
+    });
 
+    res.status(200).json({ riwayat });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Gagal mengambil data riwayat pengambilan.' });
+  }
+};
 module.exports = {
   pengambilanBarang,
   getRiwayatPengambilan,

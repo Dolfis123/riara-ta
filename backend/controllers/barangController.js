@@ -29,7 +29,7 @@ exports.createBarang = async (req, res) => {
       width: 300,
     });
 
-    const qrUrl = `${req.protocol}://${req.get('host')}/qris/${qrFilename}`;
+    const qrUrl = `${req.protocol}://${req.get('host')}/api/qris/${qrFilename}`;
     newBarang.QR_Code = qrUrl;
     await newBarang.save();
     

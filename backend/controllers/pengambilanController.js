@@ -1,4 +1,5 @@
 const { RiwayatPengambilan, Barang, Pegawai } = require('../models');
+const { Op } = require('sequelize');  // Pastikan hanya satu deklarasi Op
 
 // Controller untuk pengambilan barang
 const pengambilanBarang = async (req, res) => {
@@ -67,8 +68,7 @@ const getRiwayatPengambilan = async (req, res) => {
   }
 };
 
-const { Op, fn, col } = require('sequelize');
-
+// Fungsi untuk menghitung jumlah barang yang diambil
 function getJumlahBarangDiambil(req, res) {
   const now = new Date();
 
@@ -130,9 +130,6 @@ function getJumlahBarangDiambil(req, res) {
   });
 }
 
-const { Op } = require('sequelize');
-const RiwayatPengambilan = require('../models/riwayat_pengambilan'); // model anda
-
 // API untuk statistik dengan filter tanggal dinamis
 async function getStatistikByDateRange(req, res) {
   try {
@@ -166,8 +163,6 @@ async function getStatistikByDateRange(req, res) {
     res.status(500).json({ message: 'Gagal mengambil data statistik' });
   }
 }
-
-
 
 module.exports = {
   pengambilanBarang,

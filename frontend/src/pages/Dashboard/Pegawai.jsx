@@ -42,25 +42,25 @@ const [pinError, setPinError] = useState("");
   });
 
   // Fetch data pegawai dari backend
-  useEffect(() => {
-    const fetchPegawai = async () => {
-      try {
-        const token = localStorage.getItem("token"); // Ambil token dari localStorage
+  // useEffect(() => {
+  //   const fetchPegawai = async () => {
+  //     try {
+  //       const token = localStorage.getItem("token"); // Ambil token dari localStorage
   
-        const response = await axios.get(`${API_URL}/auth`, {
-          headers: {
-            Authorization: `Bearer ${token}` // Kirim token sebagai Bearer token
-          }
-        });
+  //       const response = await axios.get(`${API_URL}/auth`, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}` // Kirim token sebagai Bearer token
+  //         }
+  //       });
   
-        setPegawaiList(response.data); // Set hasil data ke state
-      } catch (error) {
-        console.error("Error fetching pegawai", error);
-      }
-    };
+  //       setPegawaiList(response.data); // Set hasil data ke state
+  //     } catch (error) {
+  //       console.error("Error fetching pegawai", error);
+  //     }
+  //   };
   
-    fetchPegawai();
-  }, []);
+  //   fetchPegawai();
+  // }, []);
   useEffect(() => {
     const fetchPegawai = async () => {
       try {

@@ -8,23 +8,31 @@ function Dashboard() {
   const [transaksiCounts, setTransaksiCounts] = useState({
     hari_ini: 0,
     bulan_ini: 0,
-    tahun_ini: 0,
-    range_custom: null
+    tahun_ini: 0
   });
 
-  const [customDate, setCustomDate] = useState({ startDate: '', endDate: '' });
+  const [selectedDate, setSelectedDate] = useState('');
+  const [transaksiByDate, setTransaksiByDate] = useState({
+    hari: null,
+    bulan: null,
+    tahun: null
+  });
+
+  useEffect(() => {
+    fetchCounts();
+  }, []);
 
   const fetchCounts = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      // Fetch pegawai/admin count
+      // Fetch jumlah pegawai dan admin
       const pegawaiRes = await axios.get(`${API_URL}/pegawai/count-by-role`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setRoleCounts(pegawaiRes.data);
 
-      // Fetch transaksi count
+      // Fetch jumlah transaksi hari/bulan/tahun ini
       const transaksiRes = await axios.get(`${API_URL}/riwayat/pengambilan/statistik`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -34,31 +42,26 @@ function Dashboard() {
     }
   };
 
-  const fetchCustomRange = async () => {
+  const fetchTransaksiByTanggal = async () => {
+    if (!selectedDate) return;
+
     try {
       const token = localStorage.getItem("token");
-      const { startDate, endDate } = customDate;
-      if (!startDate || !endDate) return;
 
-      const response = await axios.get(`${API_URL}/riwayat/pengambilan/statistik`, {
-        params: { startDate, endDate },
+      const res = await axios.get(`${API_URL}/riwayat/pengambilan/statistik/by-date`, {
+        params: { tanggal: selectedDate },
         headers: { Authorization: `Bearer ${token}` }
       });
-      setTransaksiCounts(prev => ({
-        ...prev,
-        range_custom: response.data.range_custom
-      }));
+
+      setTransaksiByDate(res.data);
     } catch (error) {
-      console.error("Error fetching custom range data:", error);
+      console.error("Error fetching transaksi by tanggal:", error);
     }
   };
 
-  useEffect(() => {
-    fetchCounts();
-  }, []);
-
   return (
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
       {/* Card Pegawai */}
       <div className="bg-gradient-to-br from-blue-500 to-blue-700 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between">
         <div>
@@ -104,35 +107,53 @@ function Dashboard() {
         <div className="text-5xl opacity-30">📆</div>
       </div>
 
-      {/* Custom Range Transaksi */}
-      <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-xl col-span-1 md:col-span-2 xl:col-span-1">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">Filter Transaksi Berdasarkan Waktu</h2>
-        <div className="flex flex-col md:flex-row gap-2">
+      {/* Input Pilih Tanggal */}
+      <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-xl col-span-1 md:col-span-2">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Pilih Tanggal Untuk Melihat Transaksi</h2>
+        <div className="flex flex-col md:flex-row gap-3">
           <input
             type="date"
-            value={customDate.startDate}
-            onChange={(e) => setCustomDate(prev => ({ ...prev, startDate: e.target.value }))}
-            className="border p-2 rounded w-full"
-          />
-          <input
-            type="date"
-            value={customDate.endDate}
-            onChange={(e) => setCustomDate(prev => ({ ...prev, endDate: e.target.value }))}
-            className="border p-2 rounded w-full"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="border p-2 rounded w-full md:w-1/3"
           />
           <button
-            onClick={fetchCustomRange}
+            onClick={fetchTransaksiByTanggal}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
-            Cek
+            Tampilkan
           </button>
         </div>
-        {transaksiCounts.range_custom !== null && (
-          <p className="mt-4 text-gray-700">
-            Total Transaksi: <span className="font-bold">{transaksiCounts.range_custom}</span>
-          </p>
-        )}
       </div>
+
+      {/* Hasil dari tanggal terpilih */}
+      {transaksiByDate.hari !== null && (
+        <>
+          <div className="bg-gradient-to-br from-purple-500 to-purple-700 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">Transaksi Pada Hari Itu</h2>
+              <p className="text-4xl font-bold mt-2">{transaksiByDate.hari}</p>
+            </div>
+            <div className="text-5xl opacity-30">📆</div>
+          </div>
+
+          <div className="bg-gradient-to-br from-orange-500 to-orange-700 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">Transaksi Bulan Itu</h2>
+              <p className="text-4xl font-bold mt-2">{transaksiByDate.bulan}</p>
+            </div>
+            <div className="text-5xl opacity-30">📅</div>
+          </div>
+
+          <div className="bg-gradient-to-br from-teal-500 to-teal-700 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">Transaksi Tahun Itu</h2>
+              <p className="text-4xl font-bold mt-2">{transaksiByDate.tahun}</p>
+            </div>
+            <div className="text-5xl opacity-30">🗓️</div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

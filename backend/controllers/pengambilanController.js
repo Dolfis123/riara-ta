@@ -132,9 +132,63 @@ const getRiwayatPengambilan = async (req, res) => {
     res.status(500).json({ message: 'Gagal mengambil data riwayat pengambilan.' });
   }
 };
+const getStatistikByDate = async (req, res) => {
+  try {
+    const { tanggal } = req.query;
+
+    if (!tanggal) {
+      return res.status(400).json({ message: 'Tanggal tidak boleh kosong.' });
+    }
+
+    const selectedDate = new Date(tanggal);
+    const startOfDay = new Date(selectedDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(selectedDate.setHours(23, 59, 59, 999));
+
+    const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+    const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    const startOfYear = new Date(selectedDate.getFullYear(), 0, 1);
+    const endOfYear = new Date(selectedDate.getFullYear(), 11, 31, 23, 59, 59, 999);
+
+    const dayCount = await RiwayatPengambilan.count({
+      where: {
+        Tanggal: {
+          [Op.between]: [startOfDay, endOfDay]
+        }
+      }
+    });
+
+    const monthCount = await RiwayatPengambilan.count({
+      where: {
+        Tanggal: {
+          [Op.between]: [startOfMonth, endOfMonth]
+        }
+      }
+    });
+
+    const yearCount = await RiwayatPengambilan.count({
+      where: {
+        Tanggal: {
+          [Op.between]: [startOfYear, endOfYear]
+        }
+      }
+    });
+
+    res.status(200).json({
+      hari: dayCount,
+      bulan: monthCount,
+      tahun: yearCount
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Gagal mengambil data berdasarkan tanggal.' });
+  }
+};
 
 module.exports = {
   pengambilanBarang,
   getRiwayatPengambilan,
-  getStatistikPengambilan
+  getStatistikPengambilan,
+  getStatistikByDate
 };

@@ -66,6 +66,63 @@ const getRiwayatPengambilan = async (req, res) => {
     res.status(500).json({ message: 'Gagal mengambil data riwayat pengambilan.' });
   }
 };
+const { Op } = require('sequelize');
+// const { RiwayatPengambilan } = require('../models');
+
+exports.getJumlahBarangDiambil = async (req, res) => {
+  try {
+    const now = new Date();
+
+    // Hari ini
+    const awalHari = new Date(now.setHours(0, 0, 0, 0));
+    const akhirHari = new Date(awalHari);
+    akhirHari.setDate(akhirHari.getDate() + 1);
+
+    // Bulan ini
+    const awalBulan = new Date(now.getFullYear(), now.getMonth(), 1);
+    const akhirBulan = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+    // Tahun ini
+    const awalTahun = new Date(now.getFullYear(), 0, 1);
+    const akhirTahun = new Date(now.getFullYear() + 1, 0, 1);
+
+    const [hariIni, bulanIni, tahunIni] = await Promise.all([
+      RiwayatPengambilan.sum('Jumlah_Diambil', {
+        where: {
+          Tanggal: {
+            [Op.gte]: awalHari,
+            [Op.lt]: akhirHari,
+          },
+        },
+      }),
+      RiwayatPengambilan.sum('Jumlah_Diambil', {
+        where: {
+          Tanggal: {
+            [Op.gte]: awalBulan,
+            [Op.lt]: akhirBulan,
+          },
+        },
+      }),
+      RiwayatPengambilan.sum('Jumlah_Diambil', {
+        where: {
+          Tanggal: {
+            [Op.gte]: awalTahun,
+            [Op.lt]: akhirTahun,
+          },
+        },
+      }),
+    ]);
+
+    res.status(200).json({
+      hariIni: hariIni || 0,
+      bulanIni: bulanIni || 0,
+      tahunIni: tahunIni || 0,
+    });
+  } catch (error) {
+    console.error('Gagal menghitung jumlah barang:', error);
+    res.status(500).json({ message: 'Terjadi kesalahan server' });
+  }
+};
 
 module.exports = {
   pengambilanBarang,

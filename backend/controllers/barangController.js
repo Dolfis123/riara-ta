@@ -1,7 +1,52 @@
+// Pastikan kode ini ada di controller yang sudah ada
 const Barang = require('../models/Barang');
 const QRCode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
+
+// Fungsi untuk menangani pemindaian QR Code dan pengurangan stok barang
+exports.scanBarang = async (req, res) => {
+  try {
+    const { id } = req.params;  // ID Barang yang dipindai
+    const barang = await Barang.findByPk(id);
+
+    if (!barang) {
+      return res.status(404).json({ message: 'Barang not found' });
+    }
+
+    if (barang.Stok_Tersedia > 0) {
+      // Kurangi stok barang
+      barang.Stok_Tersedia -= 1;
+
+      // Generate QR Code yang baru setelah stok berkurang
+      const qrFilename = `barang-${barang.ID_Barang}.png`;
+      const qrPath = path.join(__dirname, '..', 'public', 'qris', qrFilename);
+
+      // Pastikan folder public/qris ada
+      fs.mkdirSync(path.dirname(qrPath), { recursive: true });
+
+      // Generate QR code dengan stok terbaru
+      await QRCode.toFile(qrPath, `${barang.ID_Barang}?stok=${barang.Stok_Tersedia}`, {
+        errorCorrectionLevel: 'H',
+        type: 'png',
+        width: 300,
+      });
+
+      const qrUrl = `${req.protocol}://${req.get('host')}/api/qris/${qrFilename}`;
+      barang.QR_Code = qrUrl;
+
+      // Simpan perubahan ke database
+      await barang.save();
+
+      res.status(200).json({ message: 'Stok berhasil diperbarui', data: barang });
+    } else {
+      res.status(400).json({ message: 'Stok barang sudah habis' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error scanning Barang', error });
+  }
+};
 
 exports.createBarang = async (req, res) => {
   try {
@@ -69,6 +114,7 @@ exports.getBarangById = async (req, res) => {
 };
 
 // Update Barang
+// Update Barang
 exports.updateBarang = async (req, res) => {
     try {
         const { id } = req.params;
@@ -83,10 +129,22 @@ exports.updateBarang = async (req, res) => {
         barang.Deskripsi = Deskripsi || barang.Deskripsi;
         barang.Stok_Tersedia = Stok_Tersedia || barang.Stok_Tersedia;
 
-        // Jika ada QR Code baru yang di-upload
-        if (req.file) {
-            barang.QR_Code = req.file.filename;
-        }
+        // Generate QR Code baru berdasarkan Stok_Tersedia terbaru
+        const qrFilename = `barang-${barang.ID_Barang}.png`;
+        const qrPath = path.join(__dirname, '..', 'public', 'qris', qrFilename);
+
+        // Pastikan folder public/qrcodes ada
+        fs.mkdirSync(path.dirname(qrPath), { recursive: true });
+
+        // Generate QR code yang mencakup stok barang terbaru
+        await QRCode.toFile(qrPath, `${barang.ID_Barang}?stok=${barang.Stok_Tersedia}`, {
+          errorCorrectionLevel: 'H',
+          type: 'png',
+          width: 300,
+        });
+
+        const qrUrl = `${req.protocol}://${req.get('host')}/api/qris/${qrFilename}`;
+        barang.QR_Code = qrUrl;
 
         await barang.save();
 

@@ -61,6 +61,24 @@ const Barang = () => {
       [name]: value,
     }));
   };
+const handleScanBarang = async (barangId) => {
+  try {
+    // Panggil API untuk menurunkan stok dan memperbarui QR Code
+    const response = await axios.post(`${API_URL}/barang/scan/${barangId}`);
+    
+    // Ambil barang yang sudah diperbarui (termasuk QR Code baru)
+    const updatedBarang = response.data.data;
+
+    // Update barang yang ditampilkan di UI dengan barang yang baru
+    setBarangList(barangList.map((barang) => 
+      barang.ID_Barang === updatedBarang.ID_Barang ? updatedBarang : barang
+    ));
+
+    console.log('QR Code updated:', updatedBarang.QR_Code); // Debug log
+  } catch (error) {
+    console.error('Error scanning Barang:', error);
+  }
+};
 
   // Handle Add Barang
   const handleAddClick = () => {
@@ -131,7 +149,7 @@ const handleModalSubmit = async (e) => {
       setIsModalOpen(false);
     
       try {
-        const qrUrl = `${API_URL}/barang/${insertedId}`; // URL dinamis
+        const qrUrl = `${API_URL}/barang/${insertedId}`;
         const qrCode = await QRCode.toDataURL(qrUrl);
     
         await axios.put(`${API_URL}/barang/${insertedId}`, {
@@ -143,6 +161,7 @@ const handleModalSubmit = async (e) => {
     
       setSuccessMessage("Data barang berhasil ditambahkan.");
     }
+    
 
     // Ambil ulang data barang
     const response = await axios.get(`${API_URL}/barang`);
@@ -254,7 +273,7 @@ const handleModalSubmit = async (e) => {
               <td className="border px-4 py-2">{barang.Deskripsi}</td>
               <td className="border px-4 py-2">{barang.Stok_Tersedia}</td>
               <td className="border px-4 py-2">
- <td className="border px-4 py-2">
+<td className="border px-4 py-2">
   {barang.QR_Code && (
     <div className="relative group w-20 h-20">
       <img
@@ -282,9 +301,17 @@ const handleModalSubmit = async (e) => {
           />
         </svg>
       </a>
+      {/* Tombol untuk scan dan perbarui stok */}
+      <button
+        onClick={() => handleScanBarang(barang.ID_Barang)}
+        className="absolute inset-0 flex items-center justify-center bg-blue-500 bg-opacity-50 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+      >
+        Scan
+      </button>
     </div>
   )}
 </td>
+
 
 </td>
 

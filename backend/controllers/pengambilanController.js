@@ -140,15 +140,18 @@ const getStatistikByDate = async (req, res) => {
       return res.status(400).json({ message: 'Tanggal tidak boleh kosong.' });
     }
 
-    const selectedDate = new Date(tanggal);
-    const startOfDay = new Date(selectedDate.setHours(0, 0, 0, 0));
-    const endOfDay = new Date(selectedDate.setHours(23, 59, 59, 999));
+    // Pisahkan komponen tanggal dari string input (YYYY-MM-DD)
+    const [year, month, day] = tanggal.split('-').map(Number);
 
-    const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-    const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0, 23, 59, 59, 999);
+    // Bangun rentang hari itu tanpa mengubah waktu lokal
+    const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
+    const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
 
-    const startOfYear = new Date(selectedDate.getFullYear(), 0, 1);
-    const endOfYear = new Date(selectedDate.getFullYear(), 11, 31, 23, 59, 59, 999);
+    const startOfMonth = new Date(year, month - 1, 1);
+    const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+
+    const startOfYear = new Date(year, 0, 1);
+    const endOfYear = new Date(year, 11, 31, 23, 59, 59, 999);
 
     const dayCount = await RiwayatPengambilan.count({
       where: {
@@ -185,6 +188,7 @@ const getStatistikByDate = async (req, res) => {
     res.status(500).json({ message: 'Gagal mengambil data berdasarkan tanggal.' });
   }
 };
+
 
 module.exports = {
   pengambilanBarang,

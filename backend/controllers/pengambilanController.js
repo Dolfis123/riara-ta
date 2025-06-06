@@ -1,5 +1,6 @@
 const { RiwayatPengambilan, Barang, Pegawai } = require('../models');
 
+// Controller untuk pengambilan barang
 const pengambilanBarang = async (req, res) => {
   const { ID_Barang, Jumlah_Diambil, ID_Pegawai } = req.body;
 
@@ -23,36 +24,19 @@ const pengambilanBarang = async (req, res) => {
     barang.Stok_Tersedia -= Jumlah_Diambil;
     await barang.save();
 
-    // Generate QR Code baru setelah stok berkurang
-    const qrFilename = `barang-${barang.ID_Barang}.png`;
-    const qrPath = path.join(__dirname, '..', 'public', 'qris', qrFilename);
-
-    // Pastikan folder public/qrcodes ada
-    fs.mkdirSync(path.dirname(qrPath), { recursive: true });
-
-    // Generate QR Code baru dengan stok yang terbaru
-    await QRCode.toFile(qrPath, `${barang.ID_Barang}?stok=${barang.Stok_Tersedia}`, {
-      errorCorrectionLevel: 'H',
-      type: 'png',
-      width: 300,
-    });
-
-    const qrUrl = `${req.protocol}://${req.get('host')}/api/qris/${qrFilename}`;
-    barang.QR_Code = qrUrl;
-    await barang.save();
-
     // Simpan riwayat pengambilan
     const riwayat = await RiwayatPengambilan.create({
       ID_Barang,
       ID_Pegawai,
       Jumlah_Diambil,
-      Tanggal: new Date(), // pastikan field 'Tanggal' ada di model
+      Tanggal: new Date() // pastikan field 'Tanggal' ada di model
     });
 
     res.status(200).json({
       message: 'Pengambilan barang berhasil',
-      riwayat,
+      riwayat
     });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Terjadi kesalahan pada server.' });

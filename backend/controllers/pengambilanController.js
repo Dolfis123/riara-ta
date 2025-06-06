@@ -1,5 +1,6 @@
 const { RiwayatPengambilan, Barang, Pegawai } = require('../models');
-const { Op } = require('sequelize');  // Pastikan hanya satu deklarasi Op
+
+const { Op } = require('sequelize'); // hanya sekali
 
 // Controller untuk pengambilan barang
 const pengambilanBarang = async (req, res) => {

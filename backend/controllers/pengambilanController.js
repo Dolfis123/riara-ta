@@ -1,6 +1,70 @@
 const { RiwayatPengambilan, Barang, Pegawai } = require('../models');
+const { Op } = require('sequelize');
 
-const { Op } = require('sequelize'); // hanya sekali
+// Fungsi untuk menghitung pengambilan berdasarkan waktu
+const getStatistikPengambilan = async (req, res) => {
+  try {
+    const today = new Date();
+    const startOfToday = new Date(today.setHours(0, 0, 0, 0));
+    const endOfToday = new Date(today.setHours(23, 59, 59, 999));
+
+    const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0, 23, 59, 59, 999);
+
+    const startOfYear = new Date(new Date().getFullYear(), 0, 1);
+    const endOfYear = new Date(new Date().getFullYear(), 11, 31, 23, 59, 59, 999);
+
+    // Custom date range dari query (opsional)
+    const { startDate, endDate } = req.query;
+    let customRangeFilter = {};
+
+    if (startDate && endDate) {
+      customRangeFilter = {
+        Tanggal: {
+          [Op.between]: [new Date(startDate), new Date(endDate)]
+        }
+      };
+    }
+
+    const todayCount = await RiwayatPengambilan.count({
+      where: {
+        Tanggal: {
+          [Op.between]: [startOfToday, endOfToday]
+        }
+      }
+    });
+
+    const monthCount = await RiwayatPengambilan.count({
+      where: {
+        Tanggal: {
+          [Op.between]: [startOfMonth, endOfMonth]
+        }
+      }
+    });
+
+    const yearCount = await RiwayatPengambilan.count({
+      where: {
+        Tanggal: {
+          [Op.between]: [startOfYear, endOfYear]
+        }
+      }
+    });
+
+    const customRangeCount = Object.keys(customRangeFilter).length > 0
+      ? await RiwayatPengambilan.count({ where: customRangeFilter })
+      : null;
+
+    res.status(200).json({
+      hari_ini: todayCount,
+      bulan_ini: monthCount,
+      tahun_ini: yearCount,
+      range_custom: customRangeCount
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Gagal mengambil data statistik.' });
+  }
+};
 
 // Controller untuk pengambilan barang
 const pengambilanBarang = async (req, res) => {
@@ -69,105 +133,8 @@ const getRiwayatPengambilan = async (req, res) => {
   }
 };
 
-// Fungsi untuk menghitung jumlah barang yang diambil
-function getJumlahBarangDiambil(req, res) {
-  const now = new Date();
-
-  // Hari ini
-  const awalHari = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-  const akhirHari = new Date(awalHari);
-  akhirHari.setDate(akhirHari.getDate() + 1);
-
-  // Bulan ini
-  const awalBulan = new Date(now.getFullYear(), now.getMonth(), 1);
-  const akhirBulan = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-
-  // Tahun ini
-  const awalTahun = new Date(now.getFullYear(), 0, 1);
-  const akhirTahun = new Date(now.getFullYear() + 1, 0, 1);
-
-  Promise.all([
-    RiwayatPengambilan.count({
-      distinct: true,
-      col: 'ID_Transaksi',
-      where: {
-        Tanggal: {
-          [Op.gte]: awalHari,
-          [Op.lt]: akhirHari,
-        },
-      },
-    }),
-    RiwayatPengambilan.count({
-      distinct: true,
-      col: 'ID_Transaksi',
-      where: {
-        Tanggal: {
-          [Op.gte]: awalBulan,
-          [Op.lt]: akhirBulan,
-        },
-      },
-    }),
-    RiwayatPengambilan.count({
-      distinct: true,
-      col: 'ID_Transaksi',
-      where: {
-        Tanggal: {
-          [Op.gte]: awalTahun,
-          [Op.lt]: akhirTahun,
-        },
-      },
-    }),
-  ])
-  .then(([hariIni, bulanIni, tahunIni]) => {
-    res.status(200).json({
-      hariIni: hariIni || 0,
-      bulanIni: bulanIni || 0,
-      tahunIni: tahunIni || 0,
-    });
-  })
-  .catch((error) => {
-    console.error('Gagal menghitung jumlah transaksi:', error);
-    res.status(500).json({ message: 'Terjadi kesalahan server' });
-  });
-}
-
-// API untuk statistik dengan filter tanggal dinamis
-async function getStatistikByDateRange(req, res) {
-  try {
-    let { startDate, endDate } = req.query;
-
-    // Jika tidak dikirim, default ke hari ini
-    if (!startDate || !endDate) {
-      const now = new Date();
-      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-    } else {
-      startDate = new Date(startDate);
-      endDate = new Date(endDate);
-    }
-
-    // Hitung jumlah transaksi unik dalam rentang waktu
-    const countTransaksi = await RiwayatPengambilan.count({
-      where: {
-        Tanggal: {
-          [Op.gte]: startDate,
-          [Op.lt]: endDate,
-        }
-      },
-      distinct: true,
-      col: 'ID_Transaksi'
-    });
-
-    res.json({ countTransaksi });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Gagal mengambil data statistik' });
-  }
-}
-
 module.exports = {
   pengambilanBarang,
-  getJumlahBarangDiambil,
   getRiwayatPengambilan,
-  getStatistikByDateRange
+  getStatistikPengambilan
 };

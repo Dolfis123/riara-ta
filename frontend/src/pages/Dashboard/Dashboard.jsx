@@ -5,120 +5,134 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 function Dashboard() {
   const [roleCounts, setRoleCounts] = useState({ totalPegawai: 0, totalAdmin: 0 });
-  const [statistik, setStatistik] = useState({ hariIni: 0, bulanIni: 0, tahunIni: 0, hariLalu: 0, bulanLalu: 0, tahunLalu: 0 });
-  const [periode, setPeriode] = useState('default'); // opsi: default, hari, bulan, tahun, hari-lalu, bulan-lalu, tahun-lalu
+  const [transaksiCounts, setTransaksiCounts] = useState({
+    hari_ini: 0,
+    bulan_ini: 0,
+    tahun_ini: 0,
+    range_custom: null
+  });
 
-  // Fetch data from API on component mount
-  useEffect(() => {
-    const fetchCounts = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(`${API_URL}/pegawai/count-by-role`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setRoleCounts(response.data);
-      } catch (error) {
-        console.error("Error fetching role counts:", error);
-      }
-    };
+  const [customDate, setCustomDate] = useState({ startDate: '', endDate: '' });
 
-    const fetchStatistik = async () => {
-      try {
-        // Fetching statistic data from the API to get the count of 'Barang Diambil'
-        const response = await axios.get(`${API_URL}/pengambilan/statistik`);
-        setStatistik(response.data);
-      } catch (error) {
-        console.error("Error fetching statistik pengambilan:", error);
-      }
-    };
+  const fetchCounts = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-    fetchCounts();
-    fetchStatistik();
-  }, []);
+      // Fetch pegawai/admin count
+      const pegawaiRes = await axios.get(`${API_URL}/pegawai/count-by-role`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setRoleCounts(pegawaiRes.data);
 
-  // Function to determine value based on selected period
-  const getStatistikValue = () => {
-    if (periode === 'hari') return { label: 'Hari Ini', value: statistik.hariIni };
-    if (periode === 'bulan') return { label: 'Bulan Ini', value: statistik.bulanIni };
-    if (periode === 'tahun') return { label: 'Tahun Ini', value: statistik.tahunIni };
-    if (periode === 'hari-lalu') return { label: 'Hari Lalu', value: statistik.hariLalu };
-    if (periode === 'bulan-lalu') return { label: 'Bulan Lalu', value: statistik.bulanLalu };
-    if (periode === 'tahun-lalu') return { label: 'Tahun Lalu', value: statistik.tahunLalu };
-    // Default: show all
-    return [
-      { label: 'Hari Ini', value: statistik.hariIni },
-      { label: 'Bulan Ini', value: statistik.bulanIni },
-      { label: 'Tahun Ini', value: statistik.tahunIni },
-      { label: 'Hari Lalu', value: statistik.hariLalu },
-      { label: 'Bulan Lalu', value: statistik.bulanLalu },
-      { label: 'Tahun Lalu', value: statistik.tahunLalu },
-    ];
+      // Fetch transaksi count
+      const transaksiRes = await axios.get(`${API_URL}/pengambilan/statistik`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTransaksiCounts(transaksiRes.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
 
-  const statistikToRender = getStatistikValue();
+  const fetchCustomRange = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const { startDate, endDate } = customDate;
+      if (!startDate || !endDate) return;
+
+      const response = await axios.get(`${API_URL}/pengambilan/statistik`, {
+        params: { startDate, endDate },
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTransaksiCounts(prev => ({
+        ...prev,
+        range_custom: response.data.range_custom
+      }));
+    } catch (error) {
+      console.error("Error fetching custom range data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCounts();
+  }, []);
 
   return (
-    <div className="p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       {/* Card Pegawai */}
-      <div className="bg-gradient-to-br from-blue-500 to-blue-700 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between col-span-1">
+      <div className="bg-gradient-to-br from-blue-500 to-blue-700 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold">Jumlah Pegawai</h2>
           <p className="text-4xl font-bold mt-2">{roleCounts.totalPegawai}</p>
         </div>
-        <div className="text-5xl opacity-30">
-          👥
-        </div>
+        <div className="text-5xl opacity-30">👥</div>
       </div>
 
       {/* Card Admin */}
-      <div className="bg-gradient-to-br from-rose-500 to-rose-700 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between col-span-1">
+      <div className="bg-gradient-to-br from-rose-500 to-rose-700 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between">
         <div>
           <h2 className="text-xl font-semibold">Jumlah Admin</h2>
           <p className="text-4xl font-bold mt-2">{roleCounts.totalAdmin}</p>
         </div>
-        <div className="text-5xl opacity-30">
-          🛠️
+        <div className="text-5xl opacity-30">🛠️</div>
+      </div>
+
+      {/* Transaksi Hari Ini */}
+      <div className="bg-gradient-to-br from-green-500 to-green-700 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold">Transaksi Hari Ini</h2>
+          <p className="text-4xl font-bold mt-2">{transaksiCounts.hari_ini}</p>
         </div>
+        <div className="text-5xl opacity-30">📅</div>
       </div>
 
-      {/* Dropdown Pilih Periode */}
-      <div className="col-span-full">
-        <label className="block text-sm font-medium mb-1 text-gray-700">Pilih Periode</label>
-        <select
-          value={periode}
-          onChange={(e) => setPeriode(e.target.value)}
-          className="w-full sm:w-64 border-gray-300 rounded-lg p-2 shadow-sm"
-        >
-          <option value="default">Tampilkan Semua</option>
-          <option value="hari">Hanya Hari Ini</option>
-          <option value="bulan">Hanya Bulan Ini</option>
-          <option value="tahun">Hanya Tahun Ini</option>
-          <option value="hari-lalu">Hari Lalu</option>
-          <option value="bulan-lalu">Bulan Lalu</option>
-          <option value="tahun-lalu">Tahun Lalu</option>
-        </select>
+      {/* Transaksi Bulan Ini */}
+      <div className="bg-gradient-to-br from-yellow-500 to-yellow-700 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold">Transaksi Bulan Ini</h2>
+          <p className="text-4xl font-bold mt-2">{transaksiCounts.bulan_ini}</p>
+        </div>
+        <div className="text-5xl opacity-30">🗓️</div>
       </div>
 
-      {/* Card Statistik Barang Diambil */}
-      {Array.isArray(statistikToRender)
-        ? statistikToRender.map((item, index) => (
-            <div key={index} className="bg-gradient-to-br from-green-500 to-green-700 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold">Barang Diambil ({item.label})</h2>
-                <p className="text-4xl font-bold mt-2">{item.value}</p>
-              </div>
-              <div className="text-5xl opacity-30">📦</div>
-            </div>
-          ))
-        : (
-          <div className="bg-gradient-to-br from-green-500 to-green-700 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between col-span-1">
-            <div>
-              <h2 className="text-xl font-semibold">Barang Diambil ({statistikToRender.label})</h2>
-              <p className="text-4xl font-bold mt-2">{statistikToRender.value}</p>
-            </div>
-            <div className="text-5xl opacity-30">📦</div>
-          </div>
+      {/* Transaksi Tahun Ini */}
+      <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold">Transaksi Tahun Ini</h2>
+          <p className="text-4xl font-bold mt-2">{transaksiCounts.tahun_ini}</p>
+        </div>
+        <div className="text-5xl opacity-30">📆</div>
+      </div>
+
+      {/* Custom Range Transaksi */}
+      <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-xl col-span-1 md:col-span-2 xl:col-span-1">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Filter Transaksi Berdasarkan Waktu</h2>
+        <div className="flex flex-col md:flex-row gap-2">
+          <input
+            type="date"
+            value={customDate.startDate}
+            onChange={(e) => setCustomDate(prev => ({ ...prev, startDate: e.target.value }))}
+            className="border p-2 rounded w-full"
+          />
+          <input
+            type="date"
+            value={customDate.endDate}
+            onChange={(e) => setCustomDate(prev => ({ ...prev, endDate: e.target.value }))}
+            className="border p-2 rounded w-full"
+          />
+          <button
+            onClick={fetchCustomRange}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Cek
+          </button>
+        </div>
+        {transaksiCounts.range_custom !== null && (
+          <p className="mt-4 text-gray-700">
+            Total Transaksi: <span className="font-bold">{transaksiCounts.range_custom}</span>
+          </p>
         )}
+      </div>
     </div>
   );
 }

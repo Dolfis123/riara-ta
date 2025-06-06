@@ -67,7 +67,7 @@ const getRiwayatPengambilan = async (req, res) => {
   }
 };
 
-const { RiwayatPengambilan } = require('../models');
+
 const { Op } = require('sequelize');
 
 // Fungsi hitung jumlah barang diambil hari, bulan, tahun ini

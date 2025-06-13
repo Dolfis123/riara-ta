@@ -25,11 +25,12 @@ app.use(
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://pengadilannegerimanokwari.pro", "https://www.pengadilannegerimanokwari.pro"],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: ['http://localhost:5173', 'https://pengadilannegerimanokwari.pro'],
+    methods: ['GET', 'POST'],
     credentials: true,
   })
 );
+
 
 
 // Serve static files (QR Code images)

@@ -9,7 +9,7 @@ const barangRoutes = require('./routes/barang.routes');
 const riwayatPengambilanRoutes = require('./routes/riwayatPengambilan.routes');
 const authRoutes = require('./routes/auth.routes');
 const pegawaiRoutes = require('./routes/pegawai.routes');
-const pengambilanRoutes = require('./routes/pengambilan.routes');
+// const pengambilanRoutes = require('./routes/pengambilan.routes');
 const app = express();
 
 // Middleware
@@ -36,12 +36,12 @@ app.use(
 app.use('/api/qris', express.static(path.join(__dirname, 'public', 'qris')));
 
 // PATH untuk menyimpan QR Code
-app.use('/api', barangRoutes); // Rute untuk barang
+app.use('/api/riwayat', barangRoutes); // Rute untuk barang
 // app.use('/api', pegawaiRoutes); // Rute untuk pegawai
 app.use('/api/riwayat', riwayatPengambilanRoutes);  // Menambahkan riwayat pengambilan routes
 app.use('/api/auth', authRoutes);
 app.use("/api/pegawai", pegawaiRoutes);
-app.use('/api/barang', pengambilanRoutes);
+// app.use('/api/barang', pengambilanRoutes);
 // Koneksi ke Database dan Sinkronisasi
 sequelize
   .authenticate()

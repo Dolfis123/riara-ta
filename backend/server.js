@@ -25,7 +25,7 @@ app.use(
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://pengadilannegerimanokwari.pro", "https://www.pengadilannegerimanokwari.pro"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })

@@ -1,6 +1,6 @@
 const moment = require('moment-timezone');
 const { RiwayatPengambilan, Barang, Pegawai } = require('../models');
-// const { Op } = require('sequelize'); // ✅ hanya sekali di sini
+const { Op } = require('sequelize'); // ✅ hanya sekali di sini
 
 // Fungsi untuk menghitung pengambilan berdasarkan waktu (sesuaikan timezone WIT)
 const getStatistikPengambilan = async (req, res) => {

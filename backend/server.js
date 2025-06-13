@@ -9,7 +9,7 @@ const barangRoutes = require('./routes/barang.routes');
 const riwayatPengambilanRoutes = require('./routes/riwayatPengambilan.routes');
 const authRoutes = require('./routes/auth.routes');
 const pegawaiRoutes = require('./routes/pegawai.routes');
-// const pengambilanRoutes = require('./routes/pengambilan.routes');
+const pengambilanRoutes = require('./routes/pengambilan.routes');
 const app = express();
 
 // Middleware

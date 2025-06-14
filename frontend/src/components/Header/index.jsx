@@ -13,7 +13,12 @@ const Header = (props) => {
         <div className="flex items-center gap-2 sm:gap-4 lg:hidden">
           {/* <!-- Hamburger Toggle BTN --> */}
           <button
-           
+            aria-controls="sidebar"
+            onClick={(e) => {
+              e.stopPropagation();
+              props.setSidebarOpen(!props.sidebarOpen);
+            }}
+            className="z-99999 block rounded-sm border border-stroke bg-white p-1.5 shadow-sm dark:border-strokedark dark:bg-boxdark lg:hidden"
           >
             <span className="relative block h-5.5 w-5.5 cursor-pointer">
               <span className="du-block absolute right-0 h-full w-full">
@@ -50,7 +55,7 @@ const Header = (props) => {
                     
         </div>
 
-        <div className="hidden sm:block">
+        {/* <div className="hidden sm:block">
           <form action="https://formbold.com/s/unique_form_id" method="POST">
             <div className="relative">
               <button className="absolute left-0 top-1/2 -translate-y-1/2">
@@ -84,7 +89,7 @@ const Header = (props) => {
               />
             </div>
           </form>
-        </div>
+        </div> */}
 
         <div className="flex items-center gap-3 2xsm:gap-7">
           <ul className="flex items-center gap-2 2xsm:gap-4">

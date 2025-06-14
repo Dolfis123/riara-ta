@@ -196,6 +196,7 @@ const [pinError, setPinError] = useState("");
   
   return (
     <div className="container mx-auto">
+      <br />
       <h1 className="text-xl font-bold mb-4">Daftar Pegawai</h1>
       <button
         onClick={handleAddClick}

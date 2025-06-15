@@ -4,7 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import "../../index.css"; // Import CSS file for styling
 import logo from '../../images/logo/logo.png'; // Import logo image
 import bgImage from '../../images/logo/pnMkw.jpeg';
+import { Helmet } from 'react-helmet';
+
 const API_URL = import.meta.env.VITE_API_URL;
+
+
 
 function SignIn() {
   const [namaPegawai, setNamaPegawai] = useState('');
@@ -58,11 +62,17 @@ const handleLogin = async (e) => {
   
 
   return (
+    
 <div
   className="min-h-screen flex items-center justify-center bg-cover bg-center px-4"
   style={{ backgroundImage: `url(${bgImage})` }}
 >
 
+<Helmet>
+  <title>Sistem Pengambilan Barang QR - Pengadilan Negeri Manokwari</title>
+  <meta name="description" content="Aplikasi resmi Pengadilan Negeri Manokwari untuk pengambilan barang berbasis QR Code. Sistem ini digunakan oleh pegawai melalui proses login yang aman." />
+  <meta name="robots" content="index, follow" />
+</Helmet>
       <div className="w-full max-w-md bg-white dark:bg-gray-900 shadow-xl rounded-2xl p-8">
         <div className="text-center mb-6">
           <img
@@ -72,7 +82,11 @@ const handleLogin = async (e) => {
           />
   <h2 className="mt-4 text-xl font-bold text-gray-800 dark:text-white">
   Sistem Pengambilan Barang Menggunakan QR - Pengadilan Negeri Manokwari
-</h2>
+   </h2>
+   <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 text-center">
+  Sistem ini ditujukan bagi pegawai Pengadilan Negeri Manokwari untuk melakukan pengambilan barang secara aman dan terverifikasi menggunakan QR Code.
+   </p>
+
 
           {/* <p className="text-sm text-gray-600 dark:text-gray-300">
             Masuk untuk melanjutkan

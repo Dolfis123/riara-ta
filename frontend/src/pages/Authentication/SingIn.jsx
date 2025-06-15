@@ -113,7 +113,7 @@ const handleLogin = async (e) => {
               PIN
             </label>
             <div className="relative">
-            <input
+   <input
   type={showPassword ? 'text' : 'password'}
   value={pin}
   onChange={(e) => {
@@ -123,10 +123,13 @@ const handleLogin = async (e) => {
       setPin(value);
     }
   }}
+  inputMode="numeric"       // 👈 Menampilkan keyboard angka
+  pattern="\d*"             // 👈 Memberi tahu browser bahwa hanya angka yang diizinkan
   placeholder="Masukkan PIN"
   className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
   required
 />
+
 
               <div
                 className="absolute top-1/2 right-4 transform -translate-y-1/2 cursor-pointer text-gray-500 dark:text-gray-300"

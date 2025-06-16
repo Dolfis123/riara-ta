@@ -84,7 +84,7 @@ const handleLogin = async (e) => {
   Sistem Pengambilan Barang Menggunakan QR - Pengadilan Negeri Manokwari
    </h2>
    <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 text-center">
-  Sistem ini ditujukan bagi pegawai Pengadilan Negeri Manokwari untuk melakukan pengambilan barang secara aman dan terverifikasi menggunakan QR Code.
+  Sistem ini ditujukan bagi pegawai Pengadilan Negeri Manokwari untuk melakukan pengambilan barang secara cepat dan terverifikasi menggunakan QR Code.
    </p>
 
 

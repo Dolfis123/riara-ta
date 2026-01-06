@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # 1. DATABASE SERVICE
+  inventaris_db:
+    image: mysql:8.0
+    container_name: inventaris_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: db_pengadilan_negeri_manokwari
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: "app123"
+      MYSQL_ROOT_PASSWORD: "rootpassword123!" # Password cadangan untuk root
+    volumes:
+      - mysql_data_inventaris:/var/lib/mysql
+    networks:
+      - inventaris-network
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3309:3306" # Port Host 3309
+
+  # 2. BACKEND SERVICE
+  inventaris_api:
+    build: ./backend
+    container_name: inventaris_api
+    restart: always
+    ports:
+      - "7070:7070"
+    environment:
+      - PORT=7070
+      # KONEKSI DATABASE (Perhatikan DB_HOST mengarah ke nama service db)
+      - DB_HOST=inventaris_db
+      - DB_USER=appuser
+      - DB_PASS=app123
+      - DB_NAME=db_pengadilan_negeri_manokwari
+      - JWT_SECRET=dolfis123
+    volumes:
+      # Mapping folder QRIS agar file gambar tersimpan di VPS
+      - ./backend_uploads/qris:/app/public/qris
+    depends_on:
+      - inventaris_db
+    networks:
+      - inventaris-network
+
+  # 3. FRONTEND SERVICE
+  inventaris_web:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: "https://inventaris.pengadilannegerimanokwari.pro/api"
+    container_name: inventaris_web
+    restart: always
+    ports:
+      - "3003:80" # Port Host 3003
+    depends_on:
+      - inventaris_api
+    networks:
+      - inventaris-network
+
+networks:
+  inventaris-network:
+    driver: bridge
+
+volumes:
+  mysql_data_inventaris:

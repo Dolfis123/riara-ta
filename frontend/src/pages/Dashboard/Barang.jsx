@@ -258,16 +258,19 @@ const handleModalSubmit = async (e) => {
   {barang.QR_Code && (
   <div className="relative group w-20 h-20">
     {/* Pastikan URL gambar lengkap */}
-    <img
-      src={barang.QR_Code} // Gabungkan base URL
-      alt="QR Code"
-      className="w-full h-full object-contain"
-    />
-    <a
-      href={barang.QR_Code} // Gabungkan base URL
-      download={`QRCode_${barang.Nama_Barang}.png`}
-      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-    >
+<img
+        src={`${API_URL}/qris/${barang.QR_Code}`} 
+        alt="QR Code"
+        className="w-full h-full object-contain"
+        onError={(e) => { e.target.src = "https://via.placeholder.com/150?text=No+QR"; }} // Fallback jika gambar rusak
+      />
+<a
+        href={`${API_URL}/qris/${barang.QR_Code}`}
+        download={`QRCode_${barang.Nama_Barang}.png`}
+        className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        target="_blank" 
+        rel="noopener noreferrer"
+      >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className="h-6 w-6 text-white"

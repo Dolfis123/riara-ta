@@ -3,36 +3,40 @@ const QRCode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
 
+// controllers/barangController.js
+
 exports.createBarang = async (req, res) => {
   try {
     const { Nama_Barang, Deskripsi, Stok_Tersedia } = req.body;
 
-    // Step 1: Buat entri barang tanpa QR_Code dulu
+    // 1. Buat data dulu (QR Code sementara kosong)
     const newBarang = await Barang.create({
       Nama_Barang,
       Deskripsi,
       Stok_Tersedia,
-      QR_Code: '', // placeholder sementara
+      QR_Code: '', 
     });
 
-    // Step 2: Generate nama file QR Code
+    // 2. Generate Nama File
     const qrFilename = `barang-${newBarang.ID_Barang}.png`;
+    
+    // Path folder di server (Sesuai Docker Volume Anda)
     const qrPath = path.join(__dirname, '..', 'public', 'qris', qrFilename);
 
-    // Pastikan folder public/qrcodes ada
+    // Pastikan folder ada
     fs.mkdirSync(path.dirname(qrPath), { recursive: true });
 
-    // Step 3: Buat file QR Code yang menyimpan ID_Barang
+    // 3. Buat File QR Code
     await QRCode.toFile(qrPath, String(newBarang.ID_Barang), {
       errorCorrectionLevel: 'H',
       type: 'png',
       width: 300,
     });
 
-    const qrUrl = `${req.protocol}://${req.get('host')}/api/qris/${qrFilename}`;
-    newBarang.QR_Code = qrUrl;
+    // --- PERUBAHAN DI SINI ---
+    // Jangan simpan URL lengkap. Cukup simpan nama filenya saja.
+    newBarang.QR_Code = qrFilename; 
     await newBarang.save();
-    
 
     res.status(201).json({ message: 'Barang created successfully', data: newBarang });
   } catch (error) {

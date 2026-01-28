@@ -151,7 +151,6 @@ exports.deleteBarang = async (req, res) => {
     res.status(500).json({ message: "Error deleting Barang", error });
   }
 };
-const { Op } = require("sequelize");
 
 exports.searchBarangByNama = async (req, res) => {
   try {

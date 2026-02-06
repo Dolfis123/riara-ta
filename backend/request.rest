@@ -59,3 +59,14 @@ Content-Type: application/json
   "PIN": "1234",
   "Role": "super_admin"
 }
+
+### Register Pegawai Baru
+POST http://localhost:7070/api/pegawai/register
+Content-Type: application/json
+
+{
+    "Nama_Pegawai": "riani",
+    "Jabatan": "Staff IT",
+    "PIN": "",
+    "Role": "super_admin"
+}

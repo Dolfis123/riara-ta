@@ -16,19 +16,19 @@ const app = express();
 app.use(express.json()); // Ini sudah cukup untuk menangani JSON body request
 
 app.use(
-  session({
-    secret: "secretkey", // Ganti dengan secret yang lebih aman
-    resave: false,
-    saveUninitialized: true,
-  })
+    session({
+        secret: "secretkey", // Ganti dengan secret yang lebih aman
+        resave: false,
+        saveUninitialized: true,
+    })
 );
 
 app.use(
-  cors({
-    origin: ['http://localhost:5173', 'https://inventaris.pengadilannegerimanokwari.pro'],
-    methods: ['GET', 'POST'],
-    credentials: true,
-  })
+    cors({
+        origin: ['http://localhost:5173', 'https://inventaris.pengadilannegerimanokwari.pro'],
+        methods: ['GET', 'POST'],
+        credentials: true,
+    })
 );
 
 
@@ -39,26 +39,26 @@ app.use('/api/qris', express.static(path.join(__dirname, 'public', 'qris')));
 // PATH untuk menyimpan QR Code
 app.use('/api', barangRoutes); // Rute untuk barang
 // app.use('/api', pegawaiRoutes); // Rute untuk pegawai
-app.use('/api/riwayat', riwayatPengambilanRoutes);  // Menambahkan riwayat pengambilan routes
+app.use('/api/riwayat', riwayatPengambilanRoutes); // Menambahkan riwayat pengambilan routes
 app.use('/api/auth', authRoutes);
 app.use("/api/pegawai", pegawaiRoutes);
 app.use('/api/barang', pengambilanRoutes);
 // Koneksi ke Database dan Sinkronisasi
 sequelize
-  .authenticate()
-  .then(() => {
-    console.log("Database connected...");
+    .authenticate()
+    .then(() => {
+        console.log("Database connected...");
 
-    // Sinkronisasi model dengan database
-    return sequelize.sync(); // Sinkronisasi model ke database (buat tabel jika belum ada)
-  })
-  .then(() => {
-    console.log("Sinkronisasi tabel selesai.");
-  })
-  .catch((err) => console.log("Error: " + err));
+        // Sinkronisasi model dengan database
+        return sequelize.sync(); // Sinkronisasi model ke database (buat tabel jika belum ada)
+    })
+    .then(() => {
+        console.log("Sinkronisasi tabel selesai.");
+    })
+    .catch((err) => console.log("Error: " + err));
 
 // Set PORT
 const PORT = process.env.PORT || 7070;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });

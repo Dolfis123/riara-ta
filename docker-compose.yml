@@ -43,10 +43,12 @@ services:
       - inventaris-network
 
   # 3. FRONTEND SERVICE
+ # 3. FRONTEND SERVICE
   inventaris_web:
     build:
       context: ./frontend
       args:
+        # TAMBAHKAN /api DI AKHIR LINK INI:
         VITE_API_URL: "https://inventaris.pengadilannegerimanokwari.cloud/api"
     container_name: inventaris_web
     restart: always

@@ -24,16 +24,27 @@ const register = async(req, res) => {
 
 const login = async(req, res) => {
     try {
-        const { Nama_Pegawai, PIN } = req.body;
-        const pegawai = await Pegawai.findOne({ where: { Nama_Pegawai } });
+        // 1. Dukung berbagai nama variabel dari frontend (Nama_Pegawai atau username, PIN atau password)
+        const namaInput = req.body.Nama_Pegawai || req.body.username;
+        const pinInput = req.body.PIN || req.body.pin || req.body.password;
 
+        if (!namaInput || !pinInput) {
+            return res.status(400).json({ message: "Username dan PIN harus diisi" });
+        }
+
+        // 2. Cari Pegawai
+        const pegawai = await Pegawai.findOne({ where: { Nama_Pegawai: namaInput } });
         if (!pegawai) return res.status(404).json({ message: "Pegawai tidak ditemukan" });
 
-        const isMatch = await bcrypt.compare(PIN, pegawai.PIN);
+        // 3. Cocokkan PIN menggunakan bcrypt
+        const isMatch = await bcrypt.compare(String(pinInput), pegawai.PIN);
         if (!isMatch) return res.status(401).json({ message: "PIN salah" });
 
-        const token = jwt.sign({ id: pegawai.ID_Pegawai, role: pegawai.Role },
-            process.env.JWT_SECRET, { expiresIn: "100m" }
+        // 4. Buat Token JWT
+        const token = jwt.sign(
+            { id: pegawai.ID_Pegawai, role: pegawai.Role },
+            process.env.JWT_SECRET, 
+            { expiresIn: "100m" }
         );
 
         res.status(200).json({
@@ -44,7 +55,8 @@ const login = async(req, res) => {
             ID_Pegawai: pegawai.ID_Pegawai
         });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Error saat login:", error);
+        res.status(500).json({ error: "Server error, silakan coba lagi nanti." });
     }
 };
 

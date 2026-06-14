@@ -13,7 +13,7 @@ const riwayatPengambilanRoutes = require('./routes/riwayatPengambilan.routes');
 const authRoutes = require('./routes/auth.routes');
 const pegawaiRoutes = require('./routes/pegawai.routes');
 const pengambilanRoutes = require('./routes/pengambilan.routes');
-
+const bcrypt = require('bcryptjs');
 const app = express();
 
 // Middleware
@@ -53,10 +53,13 @@ const createDefaultAdmin = async () => {
         const adminExists = await Pegawai.findOne({ where: { Role: 'super_admin' } });
         
         if (!adminExists) {
+            // HASH PIN-nya di sini sebelum dimasukkan ke database
+            const hashedPin = await bcrypt.hash('123456', 10); 
+            
             await Pegawai.create({
                 Nama_Pegawai: 'admin',
                 Jabatan: 'Administrator',
-                PIN: '123456', // PIN Default
+                PIN: hashedPin, // Gunakan PIN yang sudah di-hash
                 Role: 'super_admin'
             });
             console.log("✅ Akun Super Admin default berhasil dibuat! (PIN: 123456)");

@@ -54,7 +54,7 @@ const createDefaultAdmin = async () => {
         
         if (!adminExists) {
             await Pegawai.create({
-                Nama_Pegawai: 'Super Admin Inventaris',
+                Nama_Pegawai: 'admin',
                 Jabatan: 'Administrator',
                 PIN: '123456', // PIN Default
                 Role: 'super_admin'

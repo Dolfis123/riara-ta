@@ -5,6 +5,6 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    allowedHosts: ['pengadilannegerimanokwari.pro', 'www.pengadilannegerimanokwari.pro', 'localhost', '127.0.0.1']
+    allowedHosts: ['inventaris.pengadilannegerimanokwari.cloud','localhost:5000/api', '127.0.0.1']
   }
 })

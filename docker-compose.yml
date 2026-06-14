@@ -47,7 +47,7 @@ services:
     build:
       context: ./frontend
       args:
-        VITE_API_URL: "https://inventaris.pengadilannegerimanokwari.pro/api"
+        VITE_API_URL: "https://inventaris.pengadilannegerimanokwari.cloud"
     container_name: inventaris_web
     restart: always
     ports:

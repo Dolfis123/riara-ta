@@ -25,7 +25,7 @@ app.use(
 
 app.use(
     cors({
-        origin: ['http://localhost:5173', 'https://inventaris.pengadilannegerimanokwari.pro'],
+        origin: ['http://localhost:5173', 'https://inventaris.pengadilannegerimanokwari.cloud'],
         methods: ['GET', 'POST'],
         credentials: true,
     })

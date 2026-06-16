@@ -103,14 +103,15 @@ function ScanQRCode() {
     }
 
     try {
-      const res = await axios.post(
-        `${API_URL}/barang/pengambilan`,
-        {
-          ID_Barang: barang.ID_Barang,
-          Jumlah_Diambil: jumlah,
-          ID_Pegawai: idPegawai,
-        }
-      );
+      // Ubah dari /barang/pengambilan menjadi /pengambilan/pengambilan
+const res = await axios.post(
+  `${API_URL}/pengambilan/pengambilan`, // <-- PERBAIKAN DI SINI
+  {
+    ID_Barang: barang.ID_Barang,
+    Jumlah_Diambil: jumlah,
+    ID_Pegawai: idPegawai,
+  }
+);
 
       const riwayat = res.data.riwayat;
       

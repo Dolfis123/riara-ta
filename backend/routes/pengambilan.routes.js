@@ -1,10 +1,18 @@
-// routes.js
 const express = require('express');
 const router = express.Router();
-const pengambilanController = require('./../controllers/pengambilanController');
+const pengambilanController = require('../controllers/pengambilanController');
 
-// Route untuk pengambilan barang
+// =====================================================================
+// ROUTE PENGAMBILAN BARANG
+// Base path di server.js: /api/barang
+// =====================================================================
+
+// 1. POST: Endpoint untuk memproses transaksi pengambilan barang
+// URL Akhir yang terbentuk: POST /api/barang/pengambilan
 router.post('/pengambilan', pengambilanController.pengambilanBarang);
-// Route untuk get semua riwayat pengambilan
+
+// 2. GET: Endpoint untuk mengambil semua data riwayat pengambilan
+// URL Akhir yang terbentuk: GET /api/barang/pengambilan
 router.get('/pengambilan', pengambilanController.getRiwayatPengambilan);
+
 module.exports = router;

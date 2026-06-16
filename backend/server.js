@@ -27,9 +27,14 @@ app.use(
     })
 );
 
+// PERBAIKAN CORS: Menambahkan port 3003 (Frontend Docker) agar tidak block login/transaksi
 app.use(
     cors({
-        origin: ['http://localhost:5173', 'https://inventaris.pengadilannegerimanokwari.cloud'],
+        origin: [
+            'http://localhost:5173', 
+            'http://localhost:3003', 
+            'https://inventaris.pengadilannegerimanokwari.cloud'
+        ],
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true,
     })
@@ -38,28 +43,33 @@ app.use(
 // Serve static files (QR Code images)
 app.use('/api/qris', express.static(path.join(__dirname, 'public', 'qris')));
 
-// Routes
+// =====================================================================
+// --- PERBAIKAN ROUTING UNTUK MENGATASI ERROR 404 PENGAMBILAN BARANG ---
+// =====================================================================
 app.use('/api/barang', barangRoutes); 
+
+// Mengubah mounting /api/pengambilan menjadi /api/barang
+// Di dalam pengambilanRoutes terdapat router.post('/pengambilan')
+// Sehingga gabungannya menjadi: /api/barang/pengambilan (Sesuai dengan Axios Frontend)
+app.use('/api/barang', pengambilanRoutes); 
+
 app.use('/api/riwayat', riwayatPengambilanRoutes);
 app.use('/api/auth', authRoutes);
 app.use("/api/pegawai", pegawaiRoutes);
-app.use('/api/pengambilan', pengambilanRoutes); 
+// =====================================================================
 
-// =====================================================================
-// --- FUNGSI BARU: Membuat Super Admin Default Otomatis ---
-// =====================================================================
+// --- FUNGSI: Membuat Super Admin Default Otomatis ---
 const createDefaultAdmin = async () => {
     try {
         const adminExists = await Pegawai.findOne({ where: { Role: 'super_admin' } });
         
         if (!adminExists) {
-            // HASH PIN-nya di sini sebelum dimasukkan ke database
             const hashedPin = await bcrypt.hash('123456', 10); 
             
             await Pegawai.create({
                 Nama_Pegawai: 'admin',
                 Jabatan: 'Administrator',
-                PIN: hashedPin, // Gunakan PIN yang sudah di-hash
+                PIN: hashedPin, 
                 Role: 'super_admin'
             });
             console.log("✅ Akun Super Admin default berhasil dibuat! (PIN: 123456)");
@@ -70,7 +80,6 @@ const createDefaultAdmin = async () => {
         console.error("❌ Gagal membuat akun Super Admin default:", error);
     }
 };
-// =====================================================================
 
 // Koneksi ke Database dan Sinkronisasi
 sequelize
@@ -81,7 +90,7 @@ sequelize
     })
     .then(async () => {
         console.log("Sinkronisasi tabel selesai.");
-        await createDefaultAdmin(); // Panggil fungsi pembuat admin
+        await createDefaultAdmin(); 
     })
     .catch((err) => console.log("Error: " + err));
 
